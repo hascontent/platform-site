@@ -1,0 +1,60 @@
+api_test.example:
+  path: '/api-test/example'
+  defaults:
+    _title: 'Example'
+    _controller: '\Drupal\api_test\Controller\ApiTestController::build'
+  requirements:
+    _permission: 'access content'
+
+api_test.test:
+  path: '/api-test/test'
+  defaults:
+    _controller: '\Drupal\api_test\Controller\ApiTestController::renderApi'
+  methods: [GET]
+  requirements:
+    _permission: 'access content'
+
+api_test.post:
+  path: '/api-test/test'
+  defaults:
+    _controller: '\Drupal\api_test\Controller\ApiTestController::postApiTest'
+  methods: [POST]
+  requirements:
+    _permission: 'access content'
+
+api_test.field:
+  path: '/api-test/field'
+  defaults:
+    _controller: '\Drupal\api_test\Controller\ApiTestController::postFieldConfig'
+
+  requirements:
+    _permission: 'access content'
+
+api_test.field_node:
+  path: '/api-test/node'
+  defaults:
+    _controller: '\Drupal\api_test\Controller\ApiTestController::postNodeType'
+  methods: [POST]
+  requirements:
+    _permission: 'access content'
+
+api_test.field_bundles:
+  path: '/api-test/bundle'
+  defaults:
+    _controller: '\Drupal\api_test\Controller\ApiTestController::fetchFieldBundles'
+  requirements:
+    _permission: 'access content'
+
+api_test.field_storage_config:
+  path: '/api-test/field-storage'
+  defaults:
+    _controller: '\Drupal\api_test\Controller\ApiTestController::postFieldConfig'
+  requirements:
+    _permission: 'access content'
+
+api_test.sandbox:
+  path: '/sandbox'
+  defaults:
+    _controller: '\Drupal\api_test\Controller\ApiTestController::sandbox'
+  requirements:
+    _permission: 'access content'

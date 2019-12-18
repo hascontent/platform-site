@@ -1,0 +1,21 @@
+# All action links for this module
+
+validated_fields.field_store_add:
+  # Which route will be called by the link
+  route_name: entity.field_store.add_page
+  title: 'Add Single-Field Entities'
+
+  # Where will the link appear, defined by route name.
+  appears_on:
+    - entity.field_store.collection
+    - entity.field_store.canonical
+entity.validated_field.add_form:
+  route_name: entity.validated_field.add_form
+  title: 'Add Validated field'
+  appears_on:
+    - entity.validated_field.collection
+entity.validated_field_type.add_form:
+  route_name: entity.validated_field_type.add_form
+  title: 'Add Validated field type'
+  appears_on:
+    - entity.validated_field_type.collection

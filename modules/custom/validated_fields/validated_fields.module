@@ -1,0 +1,63 @@
+<?php
+
+/**
+ * @file
+ * Contains validated_fields.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function validated_fields_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the validated_fields module.
+    case 'help.page.validated_fields':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Entities built on paragraphs meant to field content with custom validations and permissions on each field') . '</p>';
+      return $output;
+    default:
+  }
+}
+
+function validated_fields_install(){
+  $defs = \Drupal::service('plugin.manager.field.field_type')->getDefinitions();
+  $base_field_types = \Drupal::EntityTypeManager()->getStorage('field_storage_config')->loadByProperties(["entity_type" => "node"]);
+  foreach($defs as $field_name => $field_type){
+    if($field_name == "uuid" || $field_name == "path" || $field_name == "map"){
+      continue;
+    }
+    $field_store_type = \Drupal::EntityTypeManager()->getStorage('field_store_type')->create(
+      array(
+        "label" => $field_name,
+        "id" => $field_type["id"]
+      )
+    );
+    $field_store_type->save();
+    $field_storage = \Drupal::EntityTypeManager()->getStorage('field_storage_config')->create(array(
+      "field_name" => $field_type["id"],
+      "type" => $field_type["id"],
+      "entity_type" => "field_store"
+    ));
+    $field_storage->save();
+
+    $field_config = \Drupal::EntityTypeManager()->getStorage("field_config")->create(array(
+      "field_storage" => $field_storage,
+      "bundle" => $field_store_type->id
+    ));
+    $field_config->save();
+
+
+  }
+}
+
+function validated_fields_entity_type_alter( &$entity_types){
+//  $entity_types['validated_field']->addConstraint('ConstraintCollection');
+//  $entity_types['field_store']->addConstraint('ConstraintCollection');
+}
+
+function validated_fields_field_store_update($entity){
+  $foo = 'bar';
+}

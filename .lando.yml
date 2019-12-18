@@ -5,7 +5,7 @@ config:
   php: '7.3'
   via: apache
   framework: drupal8
-  # xdebug: true
+  xdebug: true
   config:
     php: .lando.php.ini
 

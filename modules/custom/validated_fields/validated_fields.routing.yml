@@ -1,0 +1,111 @@
+entity.field_store.canonical:
+  path: 'validated-fields/sfe/{field_store}'
+  defaults:
+    _entity_view: 'field_store'
+    _title: 'Field Store Value'
+  requirements:
+    _entity_access: 'field_store.view'
+
+entity.field_store.collection:
+  path: 'validated-fields/sfe/list'
+  defaults:
+    _entity_list: 'field_store'
+    _title: 'List of Field Stores'
+  requirements:
+    _permission: 'view validated field entity'
+
+validated_fields.field_store_add:
+  path: '/validated-fields/sfe/add/{field_store_type}'
+  defaults:
+    _title: 'Add Field Store'
+    _controller: 'Drupal\validated_fields\Controller\FieldStoreController::add'
+  requirements:
+    _entity_create_access: 'field_store'
+
+entity.field_store.edit_form:
+  path: '/validated-fields/sfe/{field_store}/edit'
+  defaults:
+    _entity_form: field_store.edit
+    _title: "Edit Field Store"
+  requirements:
+    _entity_access: 'field_store.edit'
+
+entity.field_store.delete_form:
+  path: '/validated-fields/sfe/{field_store}/delete'
+  defaults:
+    _entity_form: 'field_store.delete'
+    _title: 'Delete Field Store'
+  requirements:
+    _entity_access: 'field_store.delete'
+
+# validated_field.field_store_settings:
+#   path: 'admin/structure/field_store_settings'
+#   defaults:
+#     _form: '\Drupal\validated_fields\Form\sfe_settings'
+#     _title: "Field Store Settings"
+#   requirements:
+#     _permission: 'administer validated field entity types'
+
+entity.field_store_type.collection:
+  path: '/admin/structure/field_store_type'
+  defaults:
+    _entity_list: 'field_store_type'
+    _title: 'list of field store types'
+  requirements:
+    _permission: "administer content"
+
+entity.field_store.add_page:
+  path: '/validated-fields/sfe/add'
+  defaults:
+    _controller: '\Drupal\validated_fields\Controller\FieldStoreController::addPage'
+    _title: 'Add field store'
+  requirements:
+    _entity_create_access: 'field_store'
+
+entity.validated_field.add_page:
+  path: '/validated-fields/vf/add'
+  defaults:
+    _entity_form: 'validated_field.add'
+    _title: 'Add Validated Field'
+  requirements:
+    _entity_create_access: 'validated_field'
+
+entity.validated_field.collection:
+  path: '/validated-fields/vf/list'
+  defaults:
+    _entity_list: 'validated_field'
+    _title: 'List of Validated Fields'
+  requirements:
+    _permission: 'view unpublished validated fields'
+
+entity.validated_field_type.collection:
+  path: '/validated-fields/vft/list'
+  defaults:
+    _entity_list: 'validated_field_type'
+    _title: 'list of Validated Field Types'
+  requirements:
+    _permission: "administer content"
+
+entity.validated_field_type.add_page:
+  path: '/validated-fields/vft/add'
+  defaults:
+    _entity_form: 'validated_field_type.add'
+    _title: 'Add Validated Field Type'
+  requirements:
+    _entity_create_access: 'validated_field_type'
+
+entity.validated_field_type.edit_form:
+  path: '/validated-fields/vft/{validated_field_type}/edit'
+  defaults:
+    _entity_form: validated_field_type.edit
+    _title: "Edit Field Store"
+  requirements:
+    _entity_access: 'validated_field_type.update'
+
+entity.validated_field_type.delete_form:
+  path: '/validated-fields/vft/{validated_field_type}/delete'
+  defaults:
+    _entity_form: 'validated_field_type.delete'
+    _title: 'Delete Field Store'
+  requirements:
+    _entity_access: 'validated_field_type.delete'

@@ -1,0 +1,62 @@
+validated_fields.settings_tab:
+  route_name: validated_fields.field_store_settings
+  title: Settings
+  base_route: validated_fields.field_store_settings
+
+field_store.view:
+  route_name: entity.field_store.canonical
+  base_route: entity.field_store.canonical
+  title: View
+
+field_store.edit:
+  route_name: entity.field_store.edit_form
+  base_route: entity.field_store.canonical
+  title: Edit
+
+field_store.delete_confirm:
+  route_name:  entity.field_store.delete_form
+  base_route:  entity.field_store.canonical
+  title: Delete
+  weight: 10
+# Validated field routing definition
+validated_field.settings_tab:
+  route_name: validated_field.settings
+  title: 'Settings'
+  base_route: validated_field.settings
+
+entity.validated_field.canonical:
+  route_name: entity.validated_field.canonical
+  base_route: entity.validated_field.canonical
+  title: 'View'
+
+entity.validated_field.edit_form:
+  route_name: entity.validated_field.edit_form
+  base_route: entity.validated_field.canonical
+  title: 'Edit'
+
+entity.validated_field.delete_form:
+  route_name:  entity.validated_field.delete_form
+  base_route:  entity.validated_field.canonical
+  title: Delete
+  weight: 10
+# Validated field type routing definition
+validated_field_type.settings_tab:
+  route_name: validated_field_type.settings
+  title: 'Settings'
+  base_route: validated_field_type.settings
+
+entity.validated_field_type.canonical:
+  route_name: entity.validated_field_type.canonical
+  base_route: entity.validated_field_type.canonical
+  title: 'View'
+
+entity.validated_field_type.edit_form:
+  route_name: entity.validated_field_type.edit_form
+  base_route: entity.validated_field_type.canonical
+  title: 'Edit'
+
+entity.validated_field_type.delete_form:
+  route_name:  entity.validated_field_type.delete_form
+  base_route:  entity.validated_field_type.canonical
+  title: Delete
+  weight: 10

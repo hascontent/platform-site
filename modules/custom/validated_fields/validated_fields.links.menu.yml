@@ -1,0 +1,38 @@
+entity.field_store.collection:
+  title: 'Validated Fields: Field Store Listing'
+  route_name: entity.field_store.collection
+  description: 'List Field Stores'
+  weight: 10
+# validated_field.admin.structure.settings:
+#   title: Validated Field Settings
+#   description: 'Configure validated fields'
+#   route_name:  validated_field.field_store_settings
+#   parent: system.admin_structure
+
+# Validated field menu items definition
+entity.validated_field.collection:
+  title: 'Validated field list'
+  route_name: entity.validated_field.collection
+  description: 'List Validated field entities'
+  parent: system.admin_structure
+  weight: 100
+
+validated_field.admin.structure.settings:
+  title: 'Validated field settings'
+  description: 'Configure Validated field entities'
+  route_name: validated_field.settings
+  parent: system.admin_structure
+
+# Validated field type menu items definition
+entity.validated_field_type.collection:
+  title: 'Validated field type list'
+  route_name: entity.validated_field_type.collection
+  description: 'List Validated field type entities'
+  parent: system.admin_structure
+  weight: 100
+
+validated_field_type.admin.structure.settings:
+  title: 'Validated field type settings'
+  description: 'Configure Validated field type entities'
+  route_name: validated_field_type.settings
+  parent: system.admin_structure

@@ -1,0 +1,6 @@
+name: 'validated fields'
+type: module
+description: 'Entities built on paragraphs meant to field content with custom validations and permissions on each field'
+core: 8.x
+package: 'Custom'
+

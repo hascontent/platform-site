@@ -1,0 +1,5 @@
+name: Api Test
+type: module
+description: Testing APIs
+package: Custom
+core: 8.x
