@@ -31,3 +31,10 @@ sites/simpletest
 
 # Ignore SimpleTest multi-site environment.
 # simpletest
+
+#ignore mac DS_Store files
+**/.DS_Store
+
+#ignore ide meta data
+.idea
+
