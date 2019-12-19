@@ -131,7 +131,7 @@ class ValidatedFieldType extends ContentEntityBase implements ValidatedFieldType
       ->setLabel(t('Changed'))
       ->setDescription(t('The time that the entity was last edited.'));
 
-    $fields['type'] = BaseFieldDefinition::create("entity_reference")
+    $fields['field_type'] = BaseFieldDefinition::create("entity_reference")
       ->setLabel(t('Type'))
       ->setDescription(t('The Type of Field this entity stores'))
       ->setSetting('target_type','field_store_type')
