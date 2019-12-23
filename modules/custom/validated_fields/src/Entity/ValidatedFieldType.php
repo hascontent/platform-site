@@ -58,6 +58,38 @@ class ValidatedFieldType extends ContentEntityBase implements ValidatedFieldType
   use EntityPublishedTrait;
 
   /**
+   * @var \Drupal\Core\Field\FieldItemListInterface
+   */
+  private $field_type;
+
+  /**
+   *
+   * factory method for testing purposes
+   * @param $name
+   * @param $validations
+   * @return \Drupal\Core\Entity\EntityInterface
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws \Drupal\Core\Entity\EntityStorageException
+   */
+  public static function factory($name, $validations){
+    $entity = \Drupal::EntityTypeManager()->getStorage('validated_field_type')->create([
+      "name" => $name,
+      "validations" => $validations,
+      "field_type" => "text"
+    ]);
+    $entity->save();
+    return $entity;
+  }
+
+  /*
+   * accessors
+   */
+  public function getStorageType(){
+    return $this->field_type->getValue();
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function getName() {
