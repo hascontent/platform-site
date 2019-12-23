@@ -6,6 +6,7 @@
  */
 
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\validated_fields\Entity;
 
 /**
  * Implements hook_help().
@@ -48,16 +49,38 @@ function validated_fields_install(){
       "bundle" => $field_store_type->id
     ));
     $field_config->save();
-
-
   }
+
+  //extra Programming QOL stuff
+  Entity\ValidatedFieldType::factory("testname",array("test" => "validations"));
+//  Entity\ValidatedField::factory("testvf", "text");
 }
 
 function validated_fields_entity_type_alter( &$entity_types){
-//  $entity_types['validated_field']->addConstraint('ConstraintCollection');
+  $entity_types['validated_field']->addConstraint('ConstraintCollection');
+  $entity_types['validated_field_type']->addConstraint('ConstraintCollection');
 //  $entity_types['field_store']->addConstraint('ConstraintCollection');
 }
 
 function validated_fields_field_store_update($entity){
   $foo = 'bar';
+}
+
+//function validated_fields_validated_field_create($entity){
+//  $storageType = $entity->getStorageType();
+//  $storage = \Drupal::entityTypeManager()->getStorage('field_store')->create(["type" => $storageType]);
+//  $storage->save();
+//  $entity->storage = $storage;
+//}
+
+function validated_fields_validated_field_insert($entity){
+  $storageType = $entity->getStorageType();
+  $storage = \Drupal::entityTypeManager()->getStorage('field_store')->create(["type" => $storageType]);
+  $storage->save();
+  $entity->storage = $storage;
+  $entity->save();
+}
+
+function validated_fields_validated_field_delete($entity){
+  $storage = $entity->storage->referencedEntities()[0]->delete();
 }

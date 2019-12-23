@@ -9,6 +9,7 @@ use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityPublishedTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\user\UserInterface;
+use mysql_xdevapi\Exception;
 
 /**
  * Defines the Validated field entity.
@@ -135,11 +136,13 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
     return $this;
   }
 
-  //TODO: change to point to type field in validated field
   /**
    * Returns the field type of the referenced field store entity
    */
   public function getFieldType(){
+    if(!isSet($this->storage->referencedEntities()[0])){
+      throw new Exception("trying to reference field store entity that doesn't exist");
+    }
     return $this->storage->referencedEntities()[0]->type->referencedEntities()[0]->id;
   }
 
@@ -151,12 +154,11 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
    */
   public function getFieldValue(){
     if(!isSet($this->storage->referencedEntities()[0])){
-      return null;
+      throw new Exception("trying to reference field store entity that doesn't exist");
     }
     return $this->storage->referencedEntities()[0]->get("text")->value;
   }
 
-  //TODO: add null case
   /**
    * Returns an associated array of validations in the form
    *  {
@@ -173,10 +175,40 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
   public function getValidations(){
     return $this->validations->getValue()[0];
   }
+
+
+  public function getStorageType(){
+    return $this->field_type->referencedEntities()[0]->getStorageType();
+  }
+  /**
+   * @param $name
+   * @param $type
+   * @return \Drupal\Core\Entity\EntityInterface
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws \Drupal\Core\Entity\EntityStorageException
+   */
+
+  public static function factory($name, $type){
+    $vft = \Drupal::EntityTypeManager()->getStorage("validated_field_type")->loadByProperties(["name" => $type])[1];
+    $entity = \Drupal::EntityTypeManager()->getStorage('validated_field')->create([
+      "name" => $name,
+      "validations" => $vft->validations->getValue()[0],
+      "field_type" => $type->id->getValue()
+    ]);
+    $entity->save();
+    return $entity;
+  }
+
+
+//  public function validateCollection(){
+//
+//  }
   /**
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
+
     $fields = parent::baseFieldDefinitions($entity_type);
 
     // Add the published field.
@@ -264,6 +296,32 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
       ->setDescription(t('The Field Store Object holding data'))
       ->setSetting('target_type','field_store')
       ->setSetting('handler','default')
+//      ->setDisplayOptions('form', array(
+//        'type'     => 'entity_reference_autocomplete',
+//        'weight'   => 5,
+//        'settings' => array(
+//          'match_operator'    => 'CONTAINS',
+//          'size'              => '60',
+//          'autocomplete_type' => 'tags',
+//          'placeholder'       => '',
+//        ),
+//      ))
+      ->setDisplayConfigurable('form', TRUE);
+
+    $fields['comments'] = BaseFieldDefinition::create('map')
+      ->setLabel(t('Comments'))
+      ->setDescription(t('comments on field'))
+      ->setDisplayOptions('form' , [
+        'label' => 'Validations',
+        'weight' => -1,
+        'type' => 'map_assoc_widget'
+      ]);
+
+    $fields['field_type'] = BaseFieldDefinition::create("entity_reference")
+      ->setLabel(t('Type'))
+      ->setDescription(t('Validated Field Type entity associated with this validated field'))
+      ->setSetting('target_type','validated_field_type')
+      ->setSetting('handler','default')
       ->setDisplayOptions('form', array(
         'type'     => 'entity_reference_autocomplete',
         'weight'   => 5,
@@ -275,15 +333,6 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
         ),
       ))
       ->setDisplayConfigurable('form', TRUE);
-
-    $fields['comments'] = BaseFieldDefinition::create('map')
-      ->setLabel(t('Comments'))
-      ->setDescription(t('comments on field'))
-      ->setDisplayOptions('form' , [
-        'label' => 'Validations',
-        'weight' => -1,
-        'type' => 'map_assoc_widget'
-      ]);
     return $fields;
   }
 

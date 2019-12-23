@@ -42,7 +42,6 @@
  *   admin_permission = "administer validated field entity types",
  *   entity_keys = {
  *     "id" = "id",
- *     "label" = "label",
  *     "uuid" = "uuid",
  *     "bundle" = "type",
  *   },
@@ -121,28 +120,29 @@ class FieldStore extends ContentEntityBase implements FieldStoreInterface{
       ->setSetting('target_type', 'field_store_type')
       ->setReadOnly(TRUE);
 
+      //if recommenting add label back to entity keys annotation: "label" = "label",
     // Name field for the field store.
     // We set display options for the view as well as the form.
     // Users with correct privileges can change the view and edit configuration.
-    $fields['label'] = BaseFieldDefinition::create('string')
-      ->setLabel('Label')
-      ->setDescription(t('The name of the store entity.'))
-      ->setSettings(array(
-        'default_value' => '',
-        'max_length' => 255,
-        'text_processing' => 0,
-      ))
-      ->setDisplayOptions('view', array(
-        'label' => 'above',
-        'type' => 'string',
-        'weight' => -6,
-      ))
-      ->setDisplayOptions('form', array(
-        'type' => 'string_textfield',
-        'weight' => -6,
-      ))
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE);
+    // $fields['label'] = BaseFieldDefinition::create('string')
+    //   ->setLabel('Label')
+    //   ->setDescription(t('The name of the store entity.'))
+    //   ->setSettings(array(
+    //     'default_value' => '',
+    //     'max_length' => 255,
+    //     'text_processing' => 0,
+    //   ))
+    //   ->setDisplayOptions('view', array(
+    //     'label' => 'above',
+    //     'type' => 'string',
+    //     'weight' => -6,
+    //   ))
+    //   ->setDisplayOptions('form', array(
+    //     'type' => 'string_textfield',
+    //     'weight' => -6,
+    //   ))
+    //   ->setDisplayConfigurable('form', TRUE)
+    //   ->setDisplayConfigurable('view', TRUE);
 
     $fields['validated_field'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel('Validated Field')
