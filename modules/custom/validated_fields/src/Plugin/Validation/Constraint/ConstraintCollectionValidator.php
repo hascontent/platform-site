@@ -12,7 +12,37 @@ use Symfony\Component\Validator\ConstraintValidator;
  * Validates the ConstraintCollection constraint.
  */
 class ConstraintCollectionValidator extends ConstraintValidator {
-
+  //object that declares which validations can be associated with which fields
+  const ALLOWED_VALIDATIONS = array(
+    "length" => [
+      "text",
+      "email",
+      "string",
+      "string_long",
+      "text_long",
+      "text_with_summary",
+      "password"
+    ],
+    "blacklist" => [
+      "text",
+      "string",
+      "string_long",
+      "text_long",
+      "text_with_summary"
+    ],
+    "whitelist" => [
+      "text",
+      "string",
+      "string_long",
+      "text_long",
+      "text_with_summary"
+    ],
+    "notNegative" => [
+      "decimal",
+      "float",
+      "integer"
+    ]
+  );
 //validations
 
 //length
@@ -35,10 +65,19 @@ class ConstraintCollectionValidator extends ConstraintValidator {
    * {@inheritdoc}
    */
   public function validate($entity, Constraint $constraint) {
-    foreach ($entity->getValidations() as $validation => $params) {
-        $value = $entity->getFieldValue();
-        $this->$validation($entity, $constraint, $params);
-
+    $type = $entity->getStorageType();
+    foreach($entity->getValidations() as $validation => $params){
+      if(!isSet(self::ALLOWED_VALIDATIONS[$validation]) || !in_array($type,self::ALLOWED_VALIDATIONS[$validation])){
+        $this->context->addViolation($constraint->incorrectValidation, ['%validation' => $validation, '%field' => $type]);
+      }
     }
+//   these validations are deprecated
+//   they are used to validate fields rather than the correctness
+//   of the validators the user has selected for their field
+//    foreach ($entity->getValidations() as $validation => $params) {
+//        $value = $entity->getFieldValue();
+//        $this->$validation($entity, $constraint, $params);
+//
+//    }
   }
 }

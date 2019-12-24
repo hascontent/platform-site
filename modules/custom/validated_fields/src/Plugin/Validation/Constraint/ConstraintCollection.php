@@ -18,5 +18,6 @@ class ConstraintCollection extends Constraint {
 
   // The message that will be shown if the value is not unique.
   public $constraintViolation = '%value failed constraint %constraint: %message';
+  public $incorrectValidation = '%validation cannot validate field of type %field';
 
 }

@@ -39,7 +39,6 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *     "id" = "id",
  *     "label" = "name",
  *     "uuid" = "uuid",
- *     "langcode" = "langcode",
  *     "published" = "status",
  *   },
  *   links = {
@@ -56,11 +55,6 @@ class ValidatedFieldType extends ContentEntityBase implements ValidatedFieldType
 
   use EntityChangedTrait;
   use EntityPublishedTrait;
-
-  /**
-   * @var \Drupal\Core\Field\FieldItemListInterface
-   */
-  private $field_type;
 
   /**
    *
@@ -82,12 +76,28 @@ class ValidatedFieldType extends ContentEntityBase implements ValidatedFieldType
     return $entity;
   }
 
+  //////////////////////////////////////////////////
   /*
    * accessors
    */
+
+   /*
+    * returns the referenced field store id
+    */
   public function getStorageType(){
-    return $this->field_type->getValue();
+    if(!isSet($this->field_type->getValue()[0])){
+      return null;
+    }
+    return $this->field_type->getValue()[0]["target_id"];
   }
+
+  public function getValidations(){
+    if(!isSet($this->validations->getValue()[0])){
+      return null;
+    }
+    return $this->validations->getValue()[0];
+  }
+
 
   /**
    * {@inheritdoc}

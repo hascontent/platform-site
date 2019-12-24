@@ -59,25 +59,23 @@ function validated_fields_install(){
 function validated_fields_entity_type_alter( &$entity_types){
   $entity_types['validated_field']->addConstraint('ConstraintCollection');
   $entity_types['validated_field_type']->addConstraint('ConstraintCollection');
-//  $entity_types['field_store']->addConstraint('ConstraintCollection');
 }
+
+/////////////////////////////////////////////////////////////
+// ENTITY CRUD HOOKS
 
 function validated_fields_field_store_update($entity){
   $foo = 'bar';
 }
-
-//function validated_fields_validated_field_create($entity){
-//  $storageType = $entity->getStorageType();
-//  $storage = \Drupal::entityTypeManager()->getStorage('field_store')->create(["type" => $storageType]);
-//  $storage->save();
-//  $entity->storage = $storage;
-//}
 
 function validated_fields_validated_field_insert($entity){
   $storageType = $entity->getStorageType();
   $storage = \Drupal::entityTypeManager()->getStorage('field_store')->create(["type" => $storageType]);
   $storage->save();
   $entity->storage = $storage;
+  if($vft->validations->getValue() === []){
+    $entity->validations = $entity->field_type->referencedEntities()[0]->getValidations();
+  }
   $entity->save();
 }
 
