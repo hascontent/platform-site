@@ -65,12 +65,22 @@ class ConstraintCollectionValidator extends ConstraintValidator {
    * {@inheritdoc}
    */
   public function validate($entity, Constraint $constraint) {
-    $type = $entity->getStorageType();
-    foreach($entity->getValidations() as $validation => $params){
-      if(!isSet(self::ALLOWED_VALIDATIONS[$validation]) || !in_array($type,self::ALLOWED_VALIDATIONS[$validation])){
-        $this->context->addViolation($constraint->incorrectValidation, ['%validation' => $validation, '%field' => $type]);
-      }
-    }
+   $type = $entity->getStorageType();
+
+   if(!isSet($type)){
+     $this->context->addViolation($constraint->noType);
+     return;
+   }
+   foreach($entity->getValidations() as $validation => $params){
+     if(!isSet(self::ALLOWED_VALIDATIONS[$validation])){
+       $this->context->addViolation($constraint->nonexistentValidation, ['%validation' => $validation]);
+       continue;
+     }
+       if(!in_array($type,self::ALLOWED_VALIDATIONS[$validation])){
+       $this->context->addViolation($constraint->incorrectValidation, ['%validation' => $validation, '%field' => $type]);
+     }
+   }
+
 //   these validations are deprecated
 //   they are used to validate fields rather than the correctness
 //   of the validators the user has selected for their field
