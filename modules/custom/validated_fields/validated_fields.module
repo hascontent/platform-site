@@ -52,7 +52,7 @@ function validated_fields_install(){
   }
 
   //extra Programming QOL stuff
-  Entity\ValidatedFieldType::factory("testname",array("test" => "validations"));
+//  Entity\ValidatedFieldType::factory("testname",array("test" => "validations"));
 //  Entity\ValidatedField::factory("testvf", "text");
 }
 
@@ -73,7 +73,7 @@ function validated_fields_validated_field_insert($entity){
   $storage = \Drupal::entityTypeManager()->getStorage('field_store')->create(["type" => $storageType]);
   $storage->save();
   $entity->storage = $storage;
-  if($vft->validations->getValue() === []){
+  if($entity->validations->getValue() === []){
     $entity->validations = $entity->field_type->referencedEntities()[0]->getValidations();
   }
   $entity->save();
@@ -81,4 +81,8 @@ function validated_fields_validated_field_insert($entity){
 
 function validated_fields_validated_field_delete($entity){
   $storage = $entity->storage->referencedEntities()[0]->delete();
+}
+
+function validated_fields_validated_field_create($entity){
+  $var = "test";
 }

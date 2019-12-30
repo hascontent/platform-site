@@ -188,7 +188,8 @@ class ValidatedFieldType extends ContentEntityBase implements ValidatedFieldType
           'placeholder'       => '',
         ),
       ))
-      ->setDisplayConfigurable('form', TRUE);
+      ->setDisplayConfigurable('form', TRUE)
+      ->setRequired(TRUE);
 
     $fields['validations'] = BaseFieldDefinition::create('map')
       ->setLabel(t('Default Validations'))

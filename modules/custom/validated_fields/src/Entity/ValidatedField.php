@@ -86,7 +86,7 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
     if(!isSet($this->storage->referencedEntities()[0])){
       throw new Exception("trying to reference field store entity that doesn't exist");
     }
-    return $this->storage->referencedEntities()[0]->get("text")->value;
+    return $this->storage->referencedEntities()[0]->get("value")->value;
   }
 
   /**
@@ -108,6 +108,9 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
 
 
   public function getStorageType(){
+    if(!isSet($this->field_type->referencedEntities()[0])){
+      return null;
+    }
     return $this->field_type->referencedEntities()[0]->getStorageType();
   }
   /**
@@ -313,8 +316,7 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
 //          'placeholder'       => '',
 //        ),
 //      ))
-      ->setDisplayConfigurable('form', TRUE)
-      ->setRequired(TRUE);
+      ->setDisplayConfigurable('form', TRUE);
 
     $fields['comments'] = BaseFieldDefinition::create('map')
       ->setLabel(t('Comments'))
