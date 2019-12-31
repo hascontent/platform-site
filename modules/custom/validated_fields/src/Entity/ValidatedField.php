@@ -162,6 +162,12 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
     }
     return $messages;
   }
+  /// Required Words
+  public function requiredWords(){
+    $messages = [];
+    $words = $this->getValidations()["requiredWords"];
+    
+  }
   /// Constraint Collection
   public function validateCollection(){
     $messages = [];
@@ -382,3 +388,4 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
   }
 
 }
+

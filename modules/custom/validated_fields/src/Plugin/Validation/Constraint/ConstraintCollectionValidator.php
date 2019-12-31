@@ -30,7 +30,7 @@ class ConstraintCollectionValidator extends ConstraintValidator {
       "text_long",
       "text_with_summary"
     ],
-    "whitelist" => [
+    "requiredWords" => [
       "text",
       "string",
       "string_long",
@@ -46,19 +46,19 @@ class ConstraintCollectionValidator extends ConstraintValidator {
 //validations
 
 //length
-  protected function length($entity, $constraint, array $params){
-    $length = strlen($entity->getFieldValue());
-    if(isSet($params['min']) && $length < $params['min']){
-      $min = $params['min'];
-      $this->context->addViolation($constraint->constraintViolation,
-        ['%value'=> $entity->getFieldValue(), '%constraint' => 'length', '%message' => "must be at least $min characters long, was $length"]);
-    }
+  // protected function length($entity, $constraint, array $params){
+  //   $length = strlen($entity->getFieldValue());
+  //   if(isSet($params['min']) && $length < $params['min']){
+  //     $min = $params['min'];
+  //     $this->context->addViolation($constraint->constraintViolation,
+  //       ['%value'=> $entity->getFieldValue(), '%constraint' => 'length', '%message' => "must be at least $min characters long, was $length"]);
+  //   }
 
-    if(isSet($params['max']) && $length > $params['max']){
-      $max = $params['max'];
-      $this->context->addViolation($constraint->constraintViolation,
-        ['%value'=> $entity->getFieldValue(), '%constraint' => 'length', '%message' => "must be at most $max characters long, was $length"]);
-    }
+  //   if(isSet($params['max']) && $length > $params['max']){
+  //     $max = $params['max'];
+  //     $this->context->addViolation($constraint->constraintViolation,
+  //       ['%value'=> $entity->getFieldValue(), '%constraint' => 'length', '%message' => "must be at most $max characters long, was $length"]);
+  //   }
 
   }
   /**
