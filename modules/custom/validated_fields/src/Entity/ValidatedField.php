@@ -113,13 +113,21 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
   public function getValidations(){
     return $this->validations->getValue()[0];
   }
-
+  public function resetValidations($validations = []){
+    $this->validations = $validations;
+    return $this;
+  }
 
   public function getStorageTypeId(){
     if(!isSet($this->field_type->entity)){
       return null;
     }
     return $this->field_type->entity->getStorageTypeId();
+  }
+
+  public function postSave( \Drupal\Core\Entity\EntityStorageInterface $storage, $update = true){
+    parent::postSave($storage, $update);
+    $this->getFieldStore()->save();
   }
   /**
    * @param $name
@@ -166,8 +174,26 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
   public function requiredWords(){
     $messages = [];
     $words = $this->getValidations()["requiredWords"];
-    
+    $text = $this->getFieldValue();
+    foreach($words as $word){
+      if(!preg_match("/\b{$word}\b/i",$text)){
+        array_push($messages,"Word is required: '$word'");
+      }
+    }
+    return $messages;
   }
+    /// Black List
+    public function blackList(){
+      $messages = [];
+      $words = $this->getValidations()["requiredWords"];
+      $text = $this->getFieldValue();
+      foreach($words as $word){
+        if(preg_match("/\b{$word}\b/i",$text)){
+          array_push($messages,"Word is not allowed: '$word'");
+        }
+      }
+      return $messages;
+    }
   /// Constraint Collection
   public function validateCollection(){
     $messages = [];
@@ -346,16 +372,6 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
       ->setDescription(t('The Field Store Object holding data'))
       ->setSetting('target_type','field_store')
       ->setSetting('handler','default')
-//      ->setDisplayOptions('form', array(
-//        'type'     => 'entity_reference_autocomplete',
-//        'weight'   => 5,
-//        'settings' => array(
-//          'match_operator'    => 'CONTAINS',
-//          'size'              => '60',
-//          'autocomplete_type' => 'tags',
-//          'placeholder'       => '',
-//        ),
-//      ))
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['comments'] = BaseFieldDefinition::create('map')
