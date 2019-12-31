@@ -69,7 +69,7 @@ function validated_fields_field_store_update($entity){
 }
 
 function validated_fields_validated_field_insert($entity){
-  $storageType = $entity->getStorageType();
+  $storageType = $entity->getStorageTypeId();
   $storage = \Drupal::entityTypeManager()->getStorage('field_store')->create(["type" => $storageType]);
   $storage->save();
   $entity->storage = $storage;

@@ -62,34 +62,18 @@
  */
 
 class FieldStore extends ContentEntityBase implements FieldStoreInterface{
-  public function getType(){
-    return $this->bundle;
+  public function getTypeId(){
+    return $this->type->target_id;
   }
 
-  public function customGetLanguages(){
-    return $this->getLanguages;
-  }
-  public function getActiveLangcode(){
-    return $this->activeLangcode;
+  public function getValue(){
+    return $this->get($this->getTypeId())->value;
   }
 
-  public function getDefaultLangcode(){
-    return $this->defaultLangcode;
+  public function setValue($value){
+    $this->set($this->getTypeId(),$value);
+    return $this;
   }
-
-  public function getEntityKeys(){
-    return $this->entityKeys;
-  }
-
-  public function getLangcodeKey(){
-    return $this->langcodeKey;
-  }
-
-  //TODO: add and test null case
-  public function getValidations(){
-    return $this->validated_field->referencedEntities()[0]->getValidations();
-  }
-
 /**
    * {@inheritdoc}
    *

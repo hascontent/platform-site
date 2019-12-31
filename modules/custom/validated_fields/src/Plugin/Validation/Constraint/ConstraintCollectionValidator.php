@@ -65,7 +65,7 @@ class ConstraintCollectionValidator extends ConstraintValidator {
    * {@inheritdoc}
    */
   public function validate($entity, Constraint $constraint) {
-   $type = $entity->getStorageType();
+   $type = $entity->getStorageTypeId();
 
    if(!isSet($type)){
      $this->context->addViolation($constraint->noType);

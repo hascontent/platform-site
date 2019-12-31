@@ -62,9 +62,5 @@ interface ValidatedFieldInterface extends ContentEntityInterface, EntityChangedI
    */
   public function getFieldValue();
 
-  /**
-   * Gets the type of the Validated field's field_store entity reference
-   */
-  public function getFieldType();
 
 }

@@ -84,17 +84,14 @@ class ValidatedFieldType extends ContentEntityBase implements ValidatedFieldType
    /*
     * returns the referenced field store id
     */
-  public function getStorageType(){
-    if(!isSet($this->field_type->getValue()[0])){
+  public function getStorageTypeId(){
+    if(!isSet($this->field_type->target_id)){
       return null;
     }
-    return $this->field_type->getValue()[0]["target_id"];
+    return $this->field_type->target_id;
   }
 
   public function getValidations(){
-    if(!isSet($this->validations->getValue()[0])){
-      return null;
-    }
     return $this->validations->getValue()[0];
   }
 

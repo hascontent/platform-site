@@ -9,7 +9,6 @@ use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityPublishedTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\user\UserInterface;
-use mysql_xdevapi\Exception;
 
 /**
  * Defines the Validated field entity.
@@ -66,15 +65,15 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
   /////////////////////////////////////////////////////////////
   // custom accessors
 
-  /**
-   * Returns the field type of the referenced field store entity
-   */
-  public function getFieldType(){
-    if(!isSet($this->storage->referencedEntities()[0])){
-      throw new Exception("trying to reference field store entity that doesn't exist");
-    }
-    return $this->storage->referencedEntities()[0]->type->referencedEntities()[0]->id;
-  }
+  // /**
+  //  * Returns the field type of the referenced field store entity
+  //  */
+  // public function getFieldType(){
+  //   if(!isSet($this->storage->referencedEntities()[0])){
+  //     throw new Exception("trying to reference field store entity that doesn't exist");
+  //   }
+  //   return $this->storage->referencedEntities()[0]->type->referencedEntities()[0]->id;
+  // }
 
   //TODO: test null values
   /**
@@ -83,10 +82,19 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
    * use getFieldType to check
    */
   public function getFieldValue(){
-    if(!isSet($this->storage->referencedEntities()[0])){
-      throw new Exception("trying to reference field store entity that doesn't exist");
+    return $this->getFieldStore()->get($this->getStorageTypeId())->value;
+  }
+
+  public function getFieldStore(){
+    if(!isSet($this->storage->target_id)){
+      throw new \Exception("trying to reference null field store entity");
     }
-    return $this->storage->referencedEntities()[0]->get("value")->value;
+    return $this->storage->entity;
+  }
+  public function setFieldValue($value){
+    $storage = $this->getFieldStore();
+    $storage->setValue($value);
+    return $this;
   }
 
   /**
@@ -107,11 +115,11 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
   }
 
 
-  public function getStorageType(){
-    if(!isSet($this->field_type->referencedEntities()[0])){
+  public function getStorageTypeId(){
+    if(!isSet($this->field_type->entity)){
       return null;
     }
-    return $this->field_type->referencedEntities()[0]->getStorageType();
+    return $this->field_type->entity->getStorageTypeId();
   }
   /**
    * @param $name
@@ -133,10 +141,36 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
     return $entity;
   }
 
+/// Constraints ///////////////////////////////////////////////////////////////////
+/// length
+  protected function length(){
+    $validations = $this->getValidations();
+    if(!isSet($validations["length"])){
+      return null;
+    }
+    $params = $validations["length"];
+    $messages = [];
+    $length = strlen($this->getFieldValue());
+    if(isSet($params['min']) && $length < $params['min']){
+      $min = $params['min'];
+      array_push($messages, "Field must be at least $min characters long");
+    }
 
-//  public function validateCollection(){
-//
-//  }
+    if(isSet($params['max']) && $length > $params['max']){
+      $max = $params['max'];
+      array_push($messages, "Field must be at most $max characters long");
+    }
+    return $messages;
+  }
+  /// Constraint Collection
+  public function validateCollection(){
+    $messages = [];
+    foreach ($this->getValidations() as $validation => $params) {
+      $value = $this->getFieldValue();
+      array_merge($messages, $this->$validation($params));
+    }
+    return $messages;
+  }
 
 
   /**
