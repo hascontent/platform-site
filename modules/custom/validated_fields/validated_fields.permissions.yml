@@ -48,3 +48,23 @@ view published validated field type entities:
 view unpublished validated field type entities:
   title: 'View unpublished Validated field type entities'
 
+add stage entities:
+  title: 'Create new Stage entities'
+
+administer stage entities:
+  title: 'Administer Stage entities'
+  description: 'Allow to access the administration form to configure Stage entities.'
+  restrict access: true
+
+delete stage entities:
+  title: 'Delete Stage entities'
+
+edit stage entities:
+  title: 'Edit Stage entities'
+
+view published stage entities:
+  title: 'View published Stage entities'
+
+view unpublished stage entities:
+  title: 'View unpublished Stage entities'
+
