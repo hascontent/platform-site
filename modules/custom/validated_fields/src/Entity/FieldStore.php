@@ -74,6 +74,13 @@ class FieldStore extends ContentEntityBase implements FieldStoreInterface{
     $this->set($this->getTypeId(),$value);
     return $this;
   }
+
+  public function getParentId(){
+    return $this->validated_field->target_id;
+  }
+  public function getParent(){
+    $this->get('validated_field')->entity;
+  }
 /**
    * {@inheritdoc}
    *
