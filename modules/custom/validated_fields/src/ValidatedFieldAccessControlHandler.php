@@ -23,9 +23,15 @@ class ValidatedFieldAccessControlHandler extends EntityAccessControlHandler {
     switch ($operation) {
 
       case 'view':
-
+        if(AccessResult::allowedIfHasPermisssion($account, 'administer validated field entities')->isAllowed()){
+          return AccessResult::allowed();
+        }
         if (!$entity->isPublished()) {
+          if($entity->getOwnerId() == $account->id){
           return AccessResult::allowedIfHasPermission($account, 'view unpublished validated field entities');
+          } else {
+            return AccessResult::neutral();
+          }
         }
 
 
@@ -33,11 +39,11 @@ class ValidatedFieldAccessControlHandler extends EntityAccessControlHandler {
 
       case 'update':
 
-        return AccessResult::allowedIfHasPermission($account, 'edit validated field entities');
+        return AccessResult::allowedIfHasPermission($account, 'administer validated field entities');
 
       case 'delete':
 
-        return AccessResult::allowedIfHasPermission($account, 'delete validated field entities');
+        return AccessResult::allowedIfHasPermission($account, 'administer validated field entities');
     }
 
     // Unknown operation, no opinion.
@@ -48,7 +54,7 @@ class ValidatedFieldAccessControlHandler extends EntityAccessControlHandler {
    * {@inheritdoc}
    */
   protected function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
-    return AccessResult::allowedIfHasPermission($account, 'add validated field entities');
+    return AccessResult::allowedIfHasPermission($account, 'administer validated field entities');
   }
 
 

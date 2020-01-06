@@ -16,12 +16,6 @@ administer validated field entities:
   description: 'Allow to access the administration form to configure Validated field entities.'
   restrict access: true
 
-delete validated field entities:
-  title: 'Delete Validated field entities'
-
-edit validated field entities:
-  title: 'Edit Validated field entities'
-
 view published validated field entities:
   title: 'View published Validated field entities'
 
@@ -35,18 +29,6 @@ administer validated field type entities:
   title: 'Administer Validated field type entities'
   description: 'Allow to access the administration form to configure Validated field type entities.'
   restrict access: true
-
-delete validated field type entities:
-  title: 'Delete Validated field type entities'
-
-edit validated field type entities:
-  title: 'Edit Validated field type entities'
-
-view published validated field type entities:
-  title: 'View published Validated field type entities'
-
-view unpublished validated field type entities:
-  title: 'View unpublished Validated field type entities'
 
 add stage entities:
   title: 'Create new Stage entities'
