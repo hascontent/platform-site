@@ -127,7 +127,9 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
 
   public function postSave( \Drupal\Core\Entity\EntityStorageInterface $storage, $update = true){
     parent::postSave($storage, $update);
-    $this->getFieldStore()->save();
+    if($update){
+      $this->getFieldStore()->save();
+    }
   }
   /**
    * @param $name
@@ -203,7 +205,7 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
     }
     return $messages;
   }
-
+///////////////////////////////////////////
 
   /**
    * @var \Drupal\Core\Field\FieldItemListInterface
@@ -278,7 +280,6 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
     $this->set('user_id', $account->id());
     return $this;
   }
-
 
   /**
    * {@inheritdoc}
@@ -372,6 +373,7 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
       ->setDescription(t('The Field Store Object holding data'))
       ->setSetting('target_type','field_store')
       ->setSetting('handler','default')
+      ->setReadOnly(TRUE)
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['comments'] = BaseFieldDefinition::create('map')
