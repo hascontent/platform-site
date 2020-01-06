@@ -60,7 +60,6 @@ class ConstraintCollectionValidator extends ConstraintValidator {
   //       ['%value'=> $entity->getFieldValue(), '%constraint' => 'length', '%message' => "must be at most $max characters long, was $length"]);
   //   }
 
-  }
   /**
    * {@inheritdoc}
    */

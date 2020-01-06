@@ -71,6 +71,7 @@ function validated_fields_field_store_update($entity){
 function validated_fields_validated_field_insert($entity){
   $storageType = $entity->getStorageTypeId();
   $storage = \Drupal::entityTypeManager()->getStorage('field_store')->create(["type" => $storageType]);
+  $storage->validated_field = $entity;
   $storage->save();
   $entity->storage = $storage;
   if($entity->validations->getValue() === []){
@@ -80,7 +81,9 @@ function validated_fields_validated_field_insert($entity){
 }
 
 function validated_fields_validated_field_delete($entity){
-  $storage = $entity->storage->referencedEntities()[0]->delete();
+  if(isSet($entity->storage->referencedEntities()[0])){
+    $storage = $entity->storage->referencedEntities()[0]->delete();
+  }
 }
 
 function validated_fields_validated_field_create($entity){
