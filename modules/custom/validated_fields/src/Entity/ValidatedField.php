@@ -6,7 +6,6 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
-use Drupal\Core\Entity\EntityPublishedTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\user\UserInterface;
 
@@ -45,7 +44,6 @@ use Drupal\user\UserInterface;
  *     "uuid" = "uuid",
  *     "uid" = "user_id",
  *     "langcode" = "langcode",
- *     "published" = "status",
  *   },
  *   links = {
  *     "canonical" = "/validated-fields/validated_field/{validated_field}",
@@ -60,7 +58,6 @@ use Drupal\user\UserInterface;
 class ValidatedField extends ContentEntityBase implements ValidatedFieldInterface {
 
   use EntityChangedTrait;
-  use EntityPublishedTrait;
 
   /////////////////////////////////////////////////////////////
   // custom accessors
@@ -291,9 +288,6 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
 
     $fields = parent::baseFieldDefinitions($entity_type);
 
-    // Add the published field.
-    $fields += static::publishedBaseFieldDefinitions($entity_type);
-
     $fields['user_id'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Authored by'))
       ->setDescription(t('The user ID of author of the Validated field entity.'))
@@ -340,11 +334,6 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
       ->setDisplayConfigurable('view', TRUE)
       ->setRequired(TRUE);
 
-    $fields['status']->setDescription(t('A boolean indicating whether the Validated field is published.'))
-      ->setDisplayOptions('form', [
-        'type' => 'boolean_checkbox',
-        'weight' => -3,
-      ]);
 
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))

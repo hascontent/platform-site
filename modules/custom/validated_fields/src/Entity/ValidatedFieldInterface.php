@@ -4,7 +4,6 @@ namespace Drupal\validated_fields\Entity;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
-use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\user\EntityOwnerInterface;
 
 /**
@@ -12,7 +11,7 @@ use Drupal\user\EntityOwnerInterface;
  *
  * @ingroup validated_fields
  */
-interface ValidatedFieldInterface extends ContentEntityInterface, EntityChangedInterface, EntityPublishedInterface, EntityOwnerInterface {
+interface ValidatedFieldInterface extends ContentEntityInterface, EntityChangedInterface, EntityOwnerInterface {
 
   /**
    * Add get/set methods for your configuration properties here.
