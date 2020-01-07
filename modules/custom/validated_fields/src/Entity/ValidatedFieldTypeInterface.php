@@ -4,7 +4,6 @@ namespace Drupal\validated_fields\Entity;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
-use Drupal\Core\Entity\EntityPublishedInterface;
 
 /**
  * Provides an interface for defining Validated field type entities.

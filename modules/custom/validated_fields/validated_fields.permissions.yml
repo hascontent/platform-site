@@ -29,5 +29,4 @@ view unpublished stage entities:
   title: 'View unpublished Stage entities'
 
 preview stage entities:
-  title: 'Preview Stage Entities'add validated fields entities:
-  title: 'Create new Validated Fields entities'
+  title: 'Preview Stage Entities'
