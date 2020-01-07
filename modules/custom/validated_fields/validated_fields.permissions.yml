@@ -31,21 +31,3 @@ view unpublished stage entities:
 preview stage entities:
   title: 'Preview Stage Entities'add validated fields entities:
   title: 'Create new Validated Fields entities'
-
-administer validated fields entities:
-  title: 'Administer Validated Fields entities'
-  description: 'Allow to access the administration form to configure Validated Fields entities.'
-  restrict access: true
-
-delete validated fields entities:
-  title: 'Delete Validated Fields entities'
-
-edit validated fields entities:
-  title: 'Edit Validated Fields entities'
-
-view published validated fields entities:
-  title: 'View published Validated Fields entities'
-
-view unpublished validated fields entities:
-  title: 'View unpublished Validated Fields entities'
-
