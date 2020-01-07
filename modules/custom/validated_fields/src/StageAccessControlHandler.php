@@ -21,23 +21,18 @@ class StageAccessControlHandler extends EntityAccessControlHandler {
     /** @var \Drupal\validated_fields\Entity\StageInterface $entity */
 
     switch ($operation) {
-
+      
       case 'view':
 
-        if (!$entity->isPublished()) {
-          return AccessResult::allowedIfHasPermission($account, 'view unpublished stage entities');
-        }
-
-
-        return AccessResult::allowedIfHasPermission($account, 'view published stage entities');
+        return AccessResult::allowedIfHasPermission($account, 'preview stage entities');
 
       case 'update':
 
-        return AccessResult::allowedIfHasPermission($account, 'edit stage entities');
+        return AccessResult::allowedIfHasPermission($account, 'administer stage entities');
 
       case 'delete':
 
-        return AccessResult::allowedIfHasPermission($account, 'delete stage entities');
+        return AccessResult::allowedIfHasPermission($account, 'administer stage entities');
     }
 
     // Unknown operation, no opinion.
@@ -48,7 +43,7 @@ class StageAccessControlHandler extends EntityAccessControlHandler {
    * {@inheritdoc}
    */
   protected function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
-    return AccessResult::allowedIfHasPermission($account, 'add stage entities');
+    return AccessResult::allowedIfHasPermission($account, 'administer stage entities');
   }
 
 

@@ -11,7 +11,7 @@ use Drupal\Core\Entity\EntityPublishedInterface;
  *
  * @ingroup validated_fields
  */
-interface ValidatedFieldTypeInterface extends ContentEntityInterface, EntityChangedInterface, EntityPublishedInterface {
+interface ValidatedFieldTypeInterface extends ContentEntityInterface, EntityChangedInterface {
 
   /**
    * Add get/set methods for your configuration properties here.

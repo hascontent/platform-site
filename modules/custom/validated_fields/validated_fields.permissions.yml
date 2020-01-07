@@ -1,16 +1,3 @@
-# 'delete validated field entity':
-#   title: Delete validated field content.
-# 'add validated field entity':
-#   title: Add validated field content
-# 'view validated field entity':
-#   title: View validated field content
-# 'edit validated field entity':
-#   title: Edit validated field content
-# 'administer validated field entity types':
-#   title: Administer validated field types
-# add validated field entities:
-#   title: 'Create new Validated field entities'
-
 administer validated field entities:
   title: 'Administer Validated field entities'
   description: 'Allow to access the administration form to configure Validated field entities.'
@@ -30,23 +17,35 @@ administer validated field type entities:
   description: 'Allow to access the administration form to configure Validated field type entities.'
   restrict access: true
 
-add stage entities:
-  title: 'Create new Stage entities'
-
 administer stage entities:
   title: 'Administer Stage entities'
   description: 'Allow to access the administration form to configure Stage entities.'
   restrict access: true
-
-delete stage entities:
-  title: 'Delete Stage entities'
-
-edit stage entities:
-  title: 'Edit Stage entities'
 
 view published stage entities:
   title: 'View published Stage entities'
 
 view unpublished stage entities:
   title: 'View unpublished Stage entities'
+
+preview stage entities:
+  title: 'Preview Stage Entities'add validated fields entities:
+  title: 'Create new Validated Fields entities'
+
+administer validated fields entities:
+  title: 'Administer Validated Fields entities'
+  description: 'Allow to access the administration form to configure Validated Fields entities.'
+  restrict access: true
+
+delete validated fields entities:
+  title: 'Delete Validated Fields entities'
+
+edit validated fields entities:
+  title: 'Edit Validated Fields entities'
+
+view published validated fields entities:
+  title: 'View published Validated Fields entities'
+
+view unpublished validated fields entities:
+  title: 'View unpublished Validated Fields entities'
 
