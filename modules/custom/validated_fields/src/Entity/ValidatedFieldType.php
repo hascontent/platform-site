@@ -185,6 +185,29 @@ class ValidatedFieldType extends ContentEntityBase implements ValidatedFieldType
         'type' => 'map_assoc_widget'
       ]);
 
+    $fields['category'] = BaseFieldDefinition::create("entity_reference")
+      ->setLabel(t('Category'))
+      ->setDescription(t('User organized categories of field types'))
+      ->setSetting('target_type','taxonomy_term')
+      ->setSetting('handler','default:taxonomy_term')
+      ->setSetting('handler_settings', 
+      array(
+    'target_bundles' => array(
+     'field_categories' => 'field_categories'
+    )))
+      ->setDisplayOptions('form', array(
+        'type'     => 'entity_reference_autocomplete',
+        'weight'   => 5,
+        'settings' => array(
+          'match_operator'    => 'CONTAINS',
+          'size'              => '60',
+          'autocomplete_type' => 'tags',
+          'placeholder'       => '',
+        ),
+      ))
+      ->setDisplayConfigurable('form', TRUE)
+      ->setRequired(TRUE);
+
     return $fields;
   }
 

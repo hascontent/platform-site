@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+name: Field Types
+vid: field_categories
+description: 'Organize your field types into groups for quick access'
+weight: 0
