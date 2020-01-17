@@ -27,16 +27,31 @@ class FieldStoreAccessControlHandler extends EntityAccessControlHandler {
     }
     switch ($operation) {
       case 'view':
-        if($account->id == $entity->getOwnerId() && $entity->getParent()->getPermissionLevel() > 0){
+        if($account->id() == $entity->getOwnerId() && $entity->getParent()->getPermissionLevel() > 0){
           return AccessResult::allowedIfHasPermission($account, 'view unpublished validated field entities');
+        }
+        if($account->id() == $entity->getAdminId()){
+          return AccessResult::allowedIfHasPermission($account, "administer validated field entities");
+        }
+        if ($entity->isFinalized() &&in_array($account->id(),$entity->validated_field->entity->stage->entity->content_workflow->getTalentIds())) {
+          return AccessResult::allowedIfHasPermission($account, 'view published validated field entities');
         }
         return AccessResult::neutral();
       case 'update':
-        if($account->id == $entity->getOwnerId() && $entity->getParent()->getPermissionLevel() > 1){
+        if($entity->isFinalized()){
+          return AccessResult::neutral();
+        }
+        if($account->id() == $entity->getOwnerId() && $entity->getParent()->getPermissionLevel() > 1){
           return AccessResult::allowedIfHasPermission($account, 'view unpublished validated field entities');
+        }
+        if($account->id() == $entity->getAdminId()){
+          return AccessResult::allowedIfHasPermission($account, 'administer validated field entities');
         }
         return AccessResult::neutral();
       case 'delete':
+        if($entity->isFinalized()){
+          return AccessResult::neutral();
+        }
         return AccessResult::allowedIfHasPermission($account, 'administer validated field entities');
     }
     return AccessResult::neutral();

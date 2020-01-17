@@ -3,9 +3,6 @@ administer validated field entities:
   description: 'Allow to access the administration form to configure Validated field entities.'
   restrict access: true
 
-edit own validated field entities:
-  title: 'Edit own validated field entities'
-
 view published validated field entities:
   title: 'View published Validated field entities'
 

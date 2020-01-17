@@ -36,7 +36,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *   base_table = "validated_field",
  *   data_table = "validated_field_field_data",
  *   translatable = TRUE,
- *   admin_permission = "administer validated field entities",
+ *   admin_permission = "administer site configuration",
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "name",
@@ -94,6 +94,19 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
     $storage->setValue($value);
     return $this;
   }
+  public function getStageId(){
+    return $this->get("stage")->target_id;
+  }
+  public function getStage(){
+    return $this->get("stage")->entity;
+  }
+  public function getAdminId(){
+    return $this->get("stage")->entity->getAdminId();
+  }
+
+  public function getAdmin(){
+    return $this->get("stage")->entity->getAdmin();
+  }
 
   /**
    * Returns an associated array of validations in the form
@@ -131,13 +144,16 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
   }
 
   public function getOwnerId(){
-    return $this->get('owner_stage')->entity->getOwnerId();
+    return $this->get('stage')->entity->getOwnerId();
   }
 
   public function getOwner(){
-    return $this->get('owner_stage')->entity->getOwner();
+    return $this->get('stage')->entity->getOwner();
   }
 
+  public function isFinalized(){
+    return $this->stage->entity->isFinalized();
+  }
   /**
    * @param $name
    * @param $type
@@ -254,7 +270,6 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
     $this->set('created', $timestamp);
     return $this;
   }
-
   /**
    * {@inheritdoc}
    */
@@ -344,7 +359,7 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
       ->setDisplayConfigurable('form', TRUE)
       ->setRequired(TRUE);
 
-    $fields['owner_stage'] = BaseFieldDefinition::create("entity_reference")
+    $fields['stage'] = BaseFieldDefinition::create("entity_reference")
       ->setLabel(t('Type'))
       ->setDescription(t('The stage that owns this validated field'))
       ->setSetting('target_type','stage')

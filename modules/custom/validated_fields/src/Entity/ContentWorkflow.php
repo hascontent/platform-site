@@ -36,7 +36,7 @@ use Drupal\user\UserInterface;
  *   },
  *   base_table = "content_workflow",
  *   translatable = FALSE,
- *   admin_permission = "administer content workflow entities",
+ *   admin_permission = "administer site configuration",
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "name",

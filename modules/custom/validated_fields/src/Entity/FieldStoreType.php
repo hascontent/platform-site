@@ -32,6 +32,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     "route_provider" = {
  *       "html" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
  *     },
+ *     "access" = "Drupal\validated_fields\FieldStoreTypeAccessControlHandler",
  *   },
  *   links = {
  *     "canonical" = "/admin/structure/field_store_type/{field_store_type}",
@@ -39,8 +40,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     "edit-form" = "/admin/structure/field_store_type/{field_store_type}/edit",
  *     "delete-form" = "/admin/structure/field_store_type/{field_store_type}/delete",
  *     "collection" = "/admin/structure/field_store_type",
- *   },
- *   admin_permission = "administer site configuration",
+ *   }
  * )
  *
  */

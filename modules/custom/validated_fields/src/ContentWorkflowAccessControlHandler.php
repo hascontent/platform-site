@@ -20,22 +20,27 @@ class ContentWorkflowAccessControlHandler extends EntityAccessControlHandler {
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
     /** @var \Drupal\validated_fields\Entity\ContentWorkflowInterface $entity */
 
+    if($account->hasPermission('administer site configuration')){
+      return AccessResult::allowed();
+    }
+    if($account->id() == $entity->getOwnerId()){
+      return AccessResult::allowed();
+    }
     switch ($operation) {
 
       case 'view':
 
-        if (!$entity->isPublished() && in_array($account->id(), $entity->getTalentIds())) {
-            return AccessResult::allowedIfHasPermission($account, 'view unpublished content workflow entities');
+        if (in_array($account->id(), $entity->getTalentIds())) {
+            return AccessResult::allowed();
         }
+        return AccessResult::neutral();
 
-        return AccessResult::allowedIfHasPermission($account, 'view published content workflow entities');
       case 'edit':
       case 'update':
       case 'delete':
-        if($account->id() == $entity->getOwnerId()){
-          return AccessResult::allowedIfHasPermission($account, 'administer content workflow entities');
-        }
+
         return AccessResult::neutral();
+        
     }
 
     // Unknown operation, no opinion.

@@ -23,13 +23,7 @@ class ValidatedFieldTypeAccessControlHandler extends EntityAccessControlHandler 
     switch ($operation) {
 
       case 'view':
-
-        return AccessResult::allowedIfHasPermission($account, 'administer validated field type entities');
-
       case 'update':
-
-        return AccessResult::allowedIfHasPermission($account, 'administer validated field type entities');
-
       case 'delete':
 
         return AccessResult::allowedIfHasPermission($account, 'administer validated field type entities');
