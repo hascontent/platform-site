@@ -6,9 +6,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
-use Drupal\Core\Entity\EntityPublishedTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\user\UserInterface;
 
 /**
  * Defines the Validated field entity.
@@ -38,14 +36,12 @@ use Drupal\user\UserInterface;
  *   base_table = "validated_field",
  *   data_table = "validated_field_field_data",
  *   translatable = TRUE,
- *   admin_permission = "administer validated field entities",
+ *   admin_permission = "administer site configuration",
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "name",
  *     "uuid" = "uuid",
- *     "uid" = "user_id",
  *     "langcode" = "langcode",
- *     "published" = "status",
  *   },
  *   links = {
  *     "canonical" = "/validated-fields/validated_field/{validated_field}",
@@ -60,7 +56,6 @@ use Drupal\user\UserInterface;
 class ValidatedField extends ContentEntityBase implements ValidatedFieldInterface {
 
   use EntityChangedTrait;
-  use EntityPublishedTrait;
 
   /////////////////////////////////////////////////////////////
   // custom accessors
@@ -85,6 +80,9 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
     return $this->getFieldStore()->get($this->getStorageTypeId())->value;
   }
 
+  public function getPermissionLevel(){
+    return $this->permission_level->value;
+  }
   public function getFieldStore(){
     if(!isSet($this->storage->target_id)){
       throw new \Exception("trying to reference null field store entity");
@@ -95,6 +93,19 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
     $storage = $this->getFieldStore();
     $storage->setValue($value);
     return $this;
+  }
+  public function getStageId(){
+    return $this->get("stage")->target_id;
+  }
+  public function getStage(){
+    return $this->get("stage")->entity;
+  }
+  public function getAdminId(){
+    return $this->get("stage")->entity->getAdminId();
+  }
+
+  public function getAdmin(){
+    return $this->get("stage")->entity->getAdmin();
   }
 
   /**
@@ -130,6 +141,18 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
     if($update){
       $this->getFieldStore()->save();
     }
+  }
+
+  public function getOwnerId(){
+    return $this->get('stage')->entity->getOwnerId();
+  }
+
+  public function getOwner(){
+    return $this->get('stage')->entity->getOwner();
+  }
+
+  public function isFinalized(){
+    return $this->stage->entity->isFinalized();
   }
   /**
    * @param $name
@@ -216,9 +239,6 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
    */
   public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
     parent::preCreate($storage_controller, $values);
-    $values += [
-      'user_id' => \Drupal::currentUser()->id(),
-    ];
   }
 
   /**
@@ -250,71 +270,12 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
     $this->set('created', $timestamp);
     return $this;
   }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getOwner() {
-    return $this->get('user_id')->entity;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getOwnerId() {
-    return $this->get('user_id')->target_id;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setOwnerId($uid) {
-    $this->set('user_id', $uid);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setOwner(UserInterface $account) {
-    $this->set('user_id', $account->id());
-    return $this;
-  }
-
   /**
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
 
     $fields = parent::baseFieldDefinitions($entity_type);
-
-    // Add the published field.
-    $fields += static::publishedBaseFieldDefinitions($entity_type);
-
-    $fields['user_id'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Authored by'))
-      ->setDescription(t('The user ID of author of the Validated field entity.'))
-      ->setRevisionable(TRUE)
-      ->setSetting('target_type', 'user')
-      ->setSetting('handler', 'default')
-      ->setTranslatable(TRUE)
-      ->setDisplayOptions('view', [
-        'label' => 'hidden',
-        'type' => 'author',
-        'weight' => 0,
-      ])
-      ->setDisplayOptions('form', [
-        'type' => 'entity_reference_autocomplete',
-        'weight' => 5,
-        'settings' => [
-          'match_operator' => 'CONTAINS',
-          'size' => '60',
-          'autocomplete_type' => 'tags',
-          'placeholder' => '',
-        ],
-      ])
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE);
 
     $fields['name'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Name'))
@@ -337,11 +298,6 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
       ->setDisplayConfigurable('view', TRUE)
       ->setRequired(TRUE);
 
-    $fields['status']->setDescription(t('A boolean indicating whether the Validated field is published.'))
-      ->setDisplayOptions('form', [
-        'type' => 'boolean_checkbox',
-        'weight' => -3,
-      ]);
 
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))
@@ -389,6 +345,24 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
       ->setLabel(t('Type'))
       ->setDescription(t('Validated Field Type entity associated with this validated field'))
       ->setSetting('target_type','validated_field_type')
+      ->setSetting('handler','default')
+      ->setDisplayOptions('form', array(
+        'type'     => 'entity_reference_autocomplete',
+        'weight'   => 5,
+        'settings' => array(
+          'match_operator'    => 'CONTAINS',
+          'size'              => '60',
+          'autocomplete_type' => 'tags',
+          'placeholder'       => '',
+        ),
+      ))
+      ->setDisplayConfigurable('form', TRUE)
+      ->setRequired(TRUE);
+
+    $fields['stage'] = BaseFieldDefinition::create("entity_reference")
+      ->setLabel(t('Type'))
+      ->setDescription(t('The stage that owns this validated field'))
+      ->setSetting('target_type','stage')
       ->setSetting('handler','default')
       ->setDisplayOptions('form', array(
         'type'     => 'entity_reference_autocomplete',

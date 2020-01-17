@@ -19,3 +19,8 @@ entity.validated_field_type.add_form:
   title: 'Add Validated field type'
   appears_on:
     - entity.validated_field_type.collection
+entity.content_workflow.add_form:
+  route_name: entity.content_workflow.add_form
+  title: 'Add Content Workflow'
+  appears_on:
+    - entity.content_workflow.collection

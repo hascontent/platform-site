@@ -23,21 +23,10 @@ class ValidatedFieldTypeAccessControlHandler extends EntityAccessControlHandler 
     switch ($operation) {
 
       case 'view':
-
-        if (!$entity->isPublished()) {
-          return AccessResult::allowedIfHasPermission($account, 'view unpublished validated field type entities');
-        }
-
-
-        return AccessResult::allowedIfHasPermission($account, 'view published validated field type entities');
-
       case 'update':
-
-        return AccessResult::allowedIfHasPermission($account, 'edit validated field type entities');
-
       case 'delete':
 
-        return AccessResult::allowedIfHasPermission($account, 'delete validated field type entities');
+        return AccessResult::allowedIfHasPermission($account, 'administer validated field type entities');
     }
 
     // Unknown operation, no opinion.
@@ -48,7 +37,7 @@ class ValidatedFieldTypeAccessControlHandler extends EntityAccessControlHandler 
    * {@inheritdoc}
    */
   protected function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
-    return AccessResult::allowedIfHasPermission($account, 'add validated field type entities');
+    return AccessResult::allowedIfHasPermission($account, 'administer validated field type entities');
   }
 
 

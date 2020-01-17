@@ -27,13 +27,32 @@ class FieldStoreAccessControlHandler extends EntityAccessControlHandler {
     }
     switch ($operation) {
       case 'view':
-        return AccessResult::allowedIfHasPermission($account, 'view validated field entities');
-
+        if($account->id() == $entity->getOwnerId() && $entity->getParent()->getPermissionLevel() > 0){
+          return AccessResult::allowedIfHasPermission($account, 'view unpublished validated field entities');
+        }
+        if($account->id() == $entity->getAdminId()){
+          return AccessResult::allowedIfHasPermission($account, "administer validated field entities");
+        }
+        if ($entity->isFinalized() &&in_array($account->id(),$entity->validated_field->entity->stage->entity->content_workflow->getTalentIds())) {
+          return AccessResult::allowedIfHasPermission($account, 'view published validated field entities');
+        }
+        return AccessResult::neutral();
       case 'update':
-        return AccessResult::allowedIfHasPermission($account, 'edit validated field entities');
-
+        if($entity->isFinalized()){
+          return AccessResult::neutral();
+        }
+        if($account->id() == $entity->getOwnerId() && $entity->getParent()->getPermissionLevel() > 1){
+          return AccessResult::allowedIfHasPermission($account, 'view unpublished validated field entities');
+        }
+        if($account->id() == $entity->getAdminId()){
+          return AccessResult::allowedIfHasPermission($account, 'administer validated field entities');
+        }
+        return AccessResult::neutral();
       case 'delete':
-        return AccessResult::allowedIfHasPermission($account, 'delete validated field entities');
+        if($entity->isFinalized()){
+          return AccessResult::neutral();
+        }
+        return AccessResult::allowedIfHasPermission($account, 'administer validated field entities');
     }
     return AccessResult::neutral();
   }
@@ -51,7 +70,7 @@ class FieldStoreAccessControlHandler extends EntityAccessControlHandler {
     if ($account->hasPermission($admin_permission)) {
       return AccessResult::allowed();
     }
-    return AccessResult::allowedIfHasPermission($account, 'add validated field entities');
+    return AccessResult::allowedIfHasPermission($account, 'administer validated field entities');
   }
 
 }

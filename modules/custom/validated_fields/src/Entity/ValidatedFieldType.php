@@ -5,7 +5,6 @@ namespace Drupal\validated_fields\Entity;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
-use Drupal\Core\Entity\EntityPublishedTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
 
 /**
@@ -39,7 +38,6 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *     "id" = "id",
  *     "label" = "name",
  *     "uuid" = "uuid",
- *     "published" = "status",
  *   },
  *   links = {
  *     "canonical" = "/validated-fields/validated_field_type/{validated_field_type}",
@@ -54,7 +52,6 @@ use Drupal\Core\Entity\EntityTypeInterface;
 class ValidatedFieldType extends ContentEntityBase implements ValidatedFieldTypeInterface {
 
   use EntityChangedTrait;
-  use EntityPublishedTrait;
 
   /**
    *
@@ -132,9 +129,6 @@ class ValidatedFieldType extends ContentEntityBase implements ValidatedFieldType
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = parent::baseFieldDefinitions($entity_type);
 
-    // Add the published field.
-    $fields += static::publishedBaseFieldDefinitions($entity_type);
-
     $fields['name'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Name'))
       ->setDescription(t('The name of the Validated field type entity.'))
@@ -155,12 +149,6 @@ class ValidatedFieldType extends ContentEntityBase implements ValidatedFieldType
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE)
       ->setRequired(TRUE);
-
-    $fields['status']->setDescription(t('A boolean indicating whether the Validated field type is published.'))
-      ->setDisplayOptions('form', [
-        'type' => 'boolean_checkbox',
-        'weight' => -3,
-      ]);
 
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))

@@ -1,26 +1,7 @@
-# 'delete validated field entity':
-#   title: Delete validated field content.
-# 'add validated field entity':
-#   title: Add validated field content
-# 'view validated field entity':
-#   title: View validated field content
-# 'edit validated field entity':
-#   title: Edit validated field content
-# 'administer validated field entity types':
-#   title: Administer validated field types
-# add validated field entities:
-#   title: 'Create new Validated field entities'
-
 administer validated field entities:
   title: 'Administer Validated field entities'
   description: 'Allow to access the administration form to configure Validated field entities.'
   restrict access: true
-
-delete validated field entities:
-  title: 'Delete Validated field entities'
-
-edit validated field entities:
-  title: 'Edit Validated field entities'
 
 view published validated field entities:
   title: 'View published Validated field entities'
@@ -36,31 +17,10 @@ administer validated field type entities:
   description: 'Allow to access the administration form to configure Validated field type entities.'
   restrict access: true
 
-delete validated field type entities:
-  title: 'Delete Validated field type entities'
-
-edit validated field type entities:
-  title: 'Edit Validated field type entities'
-
-view published validated field type entities:
-  title: 'View published Validated field type entities'
-
-view unpublished validated field type entities:
-  title: 'View unpublished Validated field type entities'
-
-add stage entities:
-  title: 'Create new Stage entities'
-
 administer stage entities:
   title: 'Administer Stage entities'
   description: 'Allow to access the administration form to configure Stage entities.'
   restrict access: true
-
-delete stage entities:
-  title: 'Delete Stage entities'
-
-edit stage entities:
-  title: 'Edit Stage entities'
 
 view published stage entities:
   title: 'View published Stage entities'
@@ -68,3 +28,19 @@ view published stage entities:
 view unpublished stage entities:
   title: 'View unpublished Stage entities'
 
+preview stage entities:
+  title: 'Preview Stage Entities'
+  
+add content workflow entities:
+  title: 'Create new Content Workflow entities'
+
+administer content workflow entities:
+  title: 'Administer Content Workflow entities'
+  description: 'Allow to access the administration form to configure Content Workflow entities.'
+  restrict access: true
+
+view unpublished content workflow entities:
+  title: 'View unpublished content workflow entities'
+
+view published content workflow entities:
+  title: 'View published content workflow entities'

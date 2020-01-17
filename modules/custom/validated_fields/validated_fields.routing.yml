@@ -76,7 +76,7 @@ entity.validated_field.collection:
     _entity_list: 'validated_field'
     _title: 'List of Validated Fields'
   requirements:
-    _permission: 'view unpublished validated fields'
+    _permission: 'view unpublished validated field entities'
 
 entity.validated_field_type.collection:
   path: '/validated-fields/vft/list'

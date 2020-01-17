@@ -19,25 +19,34 @@ class StageAccessControlHandler extends EntityAccessControlHandler {
    */
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
     /** @var \Drupal\validated_fields\Entity\StageInterface $entity */
+    if($account->hasPermission('administer site configuration')){
+      return AccessResult::allowed();
+    }
 
+    if(!($account->id() == $entity->getAdminId()) && !in_array($account->id(),$entity->content_workflow->entity->getTalentIds())){
+      return AccessResult::neutral();
+    }
     switch ($operation) {
 
       case 'view':
-
-        if (!$entity->isPublished()) {
-          return AccessResult::allowedIfHasPermission($account, 'view unpublished stage entities');
+        if(!$entity->isFinalized()){
+          if($entity->getOwnerId() == $account->id() || $entity->getAdminId() == $account->id()){
+            return AccessResult::allowed();
+          }
         }
-
-
-        return AccessResult::allowedIfHasPermission($account, 'view published stage entities');
-
       case 'update':
-
-        return AccessResult::allowedIfHasPermission($account, 'edit stage entities');
-
       case 'delete':
+        if($entity->isFinalized()){
+          return AccessResult::neutral();
+        }
+        if(!isSet($entity->get('content_workflow')->target_id)){
+          return AccessResult::allowedIfHasPermission($account, 'administer stage entities');
+        }
+        if($entity->getAdminId() == $account->id()){
+          return AccessResult::allowedIfHasPermission($account, 'administer stage entities');
+        }
+        return AccessResult::allowedIfHasPermission($account, 'administer stage entities');
 
-        return AccessResult::allowedIfHasPermission($account, 'delete stage entities');
     }
 
     // Unknown operation, no opinion.
@@ -48,7 +57,7 @@ class StageAccessControlHandler extends EntityAccessControlHandler {
    * {@inheritdoc}
    */
   protected function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
-    return AccessResult::allowedIfHasPermission($account, 'add stage entities');
+    return AccessResult::allowedIfHasPermission($account, 'administer stage entities');
   }
 
 

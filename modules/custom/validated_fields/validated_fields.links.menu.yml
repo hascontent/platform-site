@@ -36,3 +36,17 @@ validated_field_type.admin.structure.settings:
   description: 'Configure Validated field type entities'
   route_name: validated_field_type.settings
   parent: system.admin_structure
+
+# Content Workflow menu items definition
+entity.content_workflow.collection:
+  title: 'Content Workflow list'
+  route_name: entity.content_workflow.collection
+  description: 'List Content Workflow entities'
+  parent: system.admin_structure
+  weight: 100
+
+content_workflow.admin.structure.settings:
+  title: 'Content Workflow settings'
+  description: 'Configure Content Workflow entities'
+  route_name: content_workflow.settings
+  parent: system.admin_structure
