@@ -78,6 +78,8 @@ function validated_fields_validated_field_insert($entity){
     $entity->validations = $entity->field_type->referencedEntities()[0]->getValidations();
   }
   $entity->save();
+  $stage = $entity->getStage();
+  
 }
 
 function validated_fields_validated_field_delete($entity){

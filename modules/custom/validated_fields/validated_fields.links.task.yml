@@ -60,3 +60,24 @@ entity.validated_field_type.delete_form:
   base_route:  entity.validated_field_type.canonical
   title: Delete
   weight: 10
+# Content Workflow routing definition
+content_workflow.settings_tab:
+  route_name: content_workflow.settings
+  title: 'Settings'
+  base_route: content_workflow.settings
+
+entity.content_workflow.canonical:
+  route_name: entity.content_workflow.canonical
+  base_route: entity.content_workflow.canonical
+  title: 'View'
+
+entity.content_workflow.edit_form:
+  route_name: entity.content_workflow.edit_form
+  base_route: entity.content_workflow.canonical
+  title: 'Edit'
+
+entity.content_workflow.delete_form:
+  route_name:  entity.content_workflow.delete_form
+  base_route:  entity.content_workflow.canonical
+  title: Delete
+  weight: 10

@@ -9,7 +9,7 @@ use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityPublishedTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\user\UserInterface;
-
+use Drupal\validated_fields\Entity\ValidatedFieldInterface;
 /**
  * Defines the Stage entity.
  *
@@ -27,7 +27,7 @@ use Drupal\user\UserInterface;
  *   },
  *   base_table = "stage",
  *   translatable = FALSE,
- *   admin_permission = "administer stage entities",
+ *   admin_permission = "administer site configuration",
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "name",
@@ -105,6 +105,17 @@ class Stage extends ContentEntityBase implements StageInterface {
     return $this;
   }
 
+  public function getAdminId(){
+    return $this->get('content_workflow')->entity->getOwnerId();
+  }
+
+  public function getAdmin(){
+    return $this->get('content_workflow')->entity->getOwner();
+  }
+
+  public function isFinalized(){
+    return $this->isPublished();
+  }
   /**
    * {@inheritdoc}
    */
@@ -171,7 +182,8 @@ class Stage extends ContentEntityBase implements StageInterface {
       ->setDisplayOptions('form', [
         'type' => 'boolean_checkbox',
         'weight' => -3,
-      ]);
+      ])
+      ->setDefaultValue(FALSE);
 
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))
@@ -182,13 +194,22 @@ class Stage extends ContentEntityBase implements StageInterface {
       ->setDescription(t('The time that the entity was last edited.'));
 
     $fields['validated_fields'] = BaseFieldDefinition::create('entity_reference')
-    ->setLabel(t('Validated Fields'))
-    ->setDescription(t('The Validated Field Entities'))
-    ->setSetting('target_type','validated_field')
-    ->setSetting('handler','default')
-    ->setReadOnly(TRUE)
-    ->setDisplayConfigurable('form', TRUE)
-    ->setCardinality(-1); //infinite cardinality
+      ->setLabel(t('Validated Fields'))
+      ->setDescription(t('The Validated Field Entities'))
+      ->setSetting('target_type','validated_field')
+      ->setSetting('handler','default')
+      ->setReadOnly(TRUE)
+      ->setDisplayConfigurable('form', TRUE)
+      ->setCardinality(-1); //infinite cardinality
+    $fields['content_workflow'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Content Workflow'))
+      ->setDescription(t('The workflow this stage is a part of'))
+      ->setSetting('target_type','content_workflow')
+      ->setSetting('handler','default')
+      ->setReadOnly(TRUE)
+      ->setDisplayConfigurable('form', TRUE)
+      ->setRequired(TRUE)
+      ->setCardinality(1);
     return $fields;
   }
 

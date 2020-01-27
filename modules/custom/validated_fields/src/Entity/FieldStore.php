@@ -39,7 +39,7 @@
  *   },
  *   list_cache_contexts = { "user" },
  *   base_table = "field_store",
- *   admin_permission = "administer validated field entity types",
+ *   admin_permission = "administer site configuration",
  *   entity_keys = {
  *     "id" = "id",
  *     "uuid" = "uuid",
@@ -80,7 +80,21 @@ class FieldStore extends ContentEntityBase implements FieldStoreInterface{
     return $this->validated_field->target_id;
   }
   public function getParent(){
-    $this->get('validated_field')->entity;
+    return $this->get('validated_field')->entity;
+  }
+
+  public function getAdminId(){
+    return $this->getParent()->getAdminId();
+  }
+
+  public function getOwnerId(){
+    return $this->getParent()->getOwnerId();
+  }
+  public function getOwner(){
+    return $this->getParent()->getOwner();
+  }
+  public function isFinalized(){
+    return $this->validated_field->entity->isFinalized();
   }
 /**
    * {@inheritdoc}

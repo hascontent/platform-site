@@ -4,14 +4,13 @@ namespace Drupal\validated_fields\Entity;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
-use Drupal\user\EntityOwnerInterface;
 
 /**
  * Provides an interface for defining Validated field entities.
  *
  * @ingroup validated_fields
  */
-interface ValidatedFieldInterface extends ContentEntityInterface, EntityChangedInterface, EntityOwnerInterface {
+interface ValidatedFieldInterface extends ContentEntityInterface, EntityChangedInterface {
 
   /**
    * Add get/set methods for your configuration properties here.

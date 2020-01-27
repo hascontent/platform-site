@@ -19,31 +19,30 @@ class ValidatedFieldAccessControlHandler extends EntityAccessControlHandler {
    */
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
     /** @var \Drupal\validated_fields\Entity\ValidatedFieldInterface $entity */
-
+    if($account->hasPermission('administer site configuration')){
+      return AccessResult::allowed();
+    }
     switch ($operation) {
-
       case 'view':
-        if(AccessResult::allowedIfHasPermisssion($account, 'administer validated field entities')->isAllowed()){
-          return AccessResult::allowed();
+        if($account->id() == $entity->getAdminId()){
+          return AccessResult::allowedIfHasPermission($account, 'administer validated field entities');
         }
-        if (!$entity->isPublished()) {
-          if($entity->getOwnerId() == $account->id){
+        if($entity->getOwnerId() == $account->id()){
           return AccessResult::allowedIfHasPermission($account, 'view unpublished validated field entities');
-          } else {
-            return AccessResult::neutral();
-          }
         }
-
-
-        return AccessResult::allowedIfHasPermission($account, 'view published validated field entities');
-
+        if ($entity->isFinalized() &&in_array($account->id(),$entity->stage->entity->content_workflow->getTalentIds())) {
+          return AccessResult::allowedIfHasPermission($account, 'view published validated field entities');
+        }
+        return AccessResult::neutral();
       case 'update':
-
-        return AccessResult::allowedIfHasPermission($account, 'administer validated field entities');
-
       case 'delete':
-
-        return AccessResult::allowedIfHasPermission($account, 'administer validated field entities');
+        if($entity->isFinalized()){
+          return AccessResult::neutral();
+        }
+        if($account->id() == $entity->getAdminId()){
+          return AccessResult::allowedIfHasPermission($account, 'administer validated field entities');
+        }
+        return AccessResult::neutral();
     }
 
     // Unknown operation, no opinion.

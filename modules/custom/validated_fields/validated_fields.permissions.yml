@@ -30,3 +30,17 @@ view unpublished stage entities:
 
 preview stage entities:
   title: 'Preview Stage Entities'
+  
+add content workflow entities:
+  title: 'Create new Content Workflow entities'
+
+administer content workflow entities:
+  title: 'Administer Content Workflow entities'
+  description: 'Allow to access the administration form to configure Content Workflow entities.'
+  restrict access: true
+
+view unpublished content workflow entities:
+  title: 'View unpublished content workflow entities'
+
+view published content workflow entities:
+  title: 'View published content workflow entities'
