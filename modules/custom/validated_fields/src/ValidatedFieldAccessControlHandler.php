@@ -20,33 +20,33 @@ class ValidatedFieldAccessControlHandler extends EntityAccessControlHandler {
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
     /** @var \Drupal\validated_fields\Entity\ValidatedFieldInterface $entity */
     if($account->hasPermission('administer site configuration')){
-      return AccessResult::allowed();
+      return AccessResult::allowed()->cachePerUser();
     }
     switch ($operation) {
       case 'view':
         if($account->id() == $entity->getAdminId()){
-          return AccessResult::allowedIfHasPermission($account, 'administer validated field entities');
+          return AccessResult::allowedIfHasPermission($account, 'administer validated field entities')->cachePerUser();
         }
         if($entity->getOwnerId() == $account->id()){
-          return AccessResult::allowedIfHasPermission($account, 'view unpublished validated field entities');
+          return AccessResult::allowedIfHasPermission($account, 'view unpublished validated field entities')->cachePerUser();
         }
-        if ($entity->isFinalized() &&in_array($account->id(),$entity->stage->entity->content_workflow->getTalentIds())) {
-          return AccessResult::allowedIfHasPermission($account, 'view published validated field entities');
+        if ($entity->isFinalized() &&in_array($account->id(),$entity->stage->entity->content_workflow->entity->getTalentIds())) {
+          return AccessResult::allowedIfHasPermission($account, 'view published validated field entities')->cachePerUser();
         }
-        return AccessResult::neutral();
+        return AccessResult::neutral()->cachePerUser();
       case 'update':
       case 'delete':
         if($entity->isFinalized()){
-          return AccessResult::neutral();
+          return AccessResult::neutral()->cachePerUser();
         }
         if($account->id() == $entity->getAdminId()){
-          return AccessResult::allowedIfHasPermission($account, 'administer validated field entities');
+          return AccessResult::allowedIfHasPermission($account, 'administer validated field entities')->cachePerUser();
         }
-        return AccessResult::neutral();
+        return AccessResult::neutral()->cachePerUser();
     }
 
     // Unknown operation, no opinion.
-    return AccessResult::neutral();
+    return AccessResult::neutral()->cachePerUser();
   }
 
   /**

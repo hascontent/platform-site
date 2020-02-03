@@ -20,37 +20,42 @@ class StageAccessControlHandler extends EntityAccessControlHandler {
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
     /** @var \Drupal\validated_fields\Entity\StageInterface $entity */
     if($account->hasPermission('administer site configuration')){
-      return AccessResult::allowed();
+      return AccessResult::allowed()->cachePerUser();
     }
 
     if(!($account->id() == $entity->getAdminId()) && !in_array($account->id(),$entity->content_workflow->entity->getTalentIds())){
-      return AccessResult::neutral();
+      return AccessResult::neutral()->cachePerUser();
     }
     switch ($operation) {
 
       case 'view':
         if(!$entity->isFinalized()){
           if($entity->getOwnerId() == $account->id() || $entity->getAdminId() == $account->id()){
-            return AccessResult::allowed();
+            return AccessResult::allowed()->cachePerUser();
           }
         }
+        if(in_array($account->id(),$entity->getTalentIds()) || $account->id() == $entity->getAdminId()){
+          return AccessResult::allowed()->cachePerUser();
+        }
+        return AccessResult::neutral()->cachePerUser();
+
       case 'update':
       case 'delete':
         if($entity->isFinalized()){
-          return AccessResult::neutral();
+          return AccessResult::neutral()->cachePerUser();
         }
         if(!isSet($entity->get('content_workflow')->target_id)){
-          return AccessResult::allowedIfHasPermission($account, 'administer stage entities');
+          return AccessResult::allowedIfHasPermission($account, 'administer stage entities')->cachePerUser();
         }
         if($entity->getAdminId() == $account->id()){
-          return AccessResult::allowedIfHasPermission($account, 'administer stage entities');
+          return AccessResult::allowedIfHasPermission($account, 'administer stage entities')->cachePerUser();
         }
-        return AccessResult::allowedIfHasPermission($account, 'administer stage entities');
+        return AccessResult::allowedIfHasPermission($account, 'administer stage entities')->cachePerUser();
 
     }
 
     // Unknown operation, no opinion.
-    return AccessResult::neutral();
+    return AccessResult::neutral()->cachePerUser();
   }
 
   /**

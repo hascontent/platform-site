@@ -116,6 +116,10 @@ class Stage extends ContentEntityBase implements StageInterface {
   public function isFinalized(){
     return $this->isPublished();
   }
+
+  public function getTalentIds(){
+    return $this->get('content_workflow')->entity->getTalentIds();
+  }
   /**
    * {@inheritdoc}
    */
