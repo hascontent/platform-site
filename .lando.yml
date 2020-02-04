@@ -16,3 +16,8 @@ services:
       - database
   database:
     type: mysql
+  appserver:
+    overrides:
+      environment:
+        # Support debugging Drush with XDEBUG.
+        PHP_IDE_CONFIG: "serverName=appserver"
