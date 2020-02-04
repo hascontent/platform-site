@@ -1,6 +1,11 @@
 langcode: en
 status: true
-dependencies: {  }
+dependencies: 
+  module:
+    - validated_fields
+  enforced:
+    module:
+      - validated_fields
 name: Field Types
 vid: field_categories
 description: 'Organize your field types into groups for quick access'
