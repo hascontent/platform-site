@@ -45,44 +45,70 @@ class ConstraintCollectionValidator extends ConstraintValidator {
   );
 
   //object that associates fields with possible validation
-  const ALLOWED_FIELDS = array(
-    "text" => array(
-      "requiredWords",
-      "blacklist",
-      "length"
+  const VALIDATIONS_LIST = array(
+    "fields" => array(
+      "text" => array(
+        "requiredWords",
+        "blacklist",
+        "length"
+      ),
+      "string" => array(
+        "requiredWords",
+        "blacklist",
+        "length"
+      ),
+      "string_long" => array(
+        "requiredWords",
+        "blacklist",
+        "length"
+      ),
+      "text_long" => array(
+        "requiredWords",
+        "blacklist",
+        "length"
+      ),
+      "text_with_summary" => array(
+        "requiredWords",
+        "blacklist",
+        "length"
+      ),
+      "password" => array(
+        "length"
+      ),
+      "decimal" => array(
+        "notNegative"
+      ),
+      "float" => array(
+        "notNegative"
+      ),
+      "integer" => array(
+        "notNegative"
+      ),
     ),
-    "string" => array(
-      "requiredWords",
-      "blacklist",
-      "length"
-    ),
-    "string_long" => array(
-      "requiredWords",
-      "blacklist",
-      "length"
-    ),
-    "text_long" => array(
-      "requiredWords",
-      "blacklist",
-      "length"
-    ),
-    "text_with_summary" => array(
-      "requiredWords",
-      "blacklist",
-      "length"
-    ),
-    "password" => array(
-      "length"
-    ),
-    "decimal" => array(
-      "notNegative"
-    ),
-    "float" => array(
-      "notNegative"
-    ),
-    "integer" => array(
-      "notNegative"
-    ),
+    "validations" => array(
+      "notNegative" => [
+        "label" => "Not Negative"
+      ],
+      "requiredWords" => [
+        "label" => "Required Words",
+        "fields" => [
+          "Word List"
+        ]
+        ],
+      "blacklist" => [
+        "label" => "Prohibited Words",
+        "fields" => [
+          "Word List"
+        ]
+      ],
+      "length" => [
+        "label" => "Character Count",
+        "fields" => [
+          "Minimum",
+          "Maximum"
+        ]
+      ],
+    )
   );
 //validations
 

@@ -101,7 +101,7 @@ class ValidationResource extends ResourceBase {
             throw new AccessDeniedHttpException();
         }
         $qry = $this->currentRequest->query;
-        $validations = ConstraintCollectionValidator::ALLOWED_FIELDS;
+        $validations = ConstraintCollectionValidator::VALIDATIONS_LIST;
         return new ResourceResponse($validations, 200);
     }
 
