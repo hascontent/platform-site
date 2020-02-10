@@ -33,7 +33,7 @@ class FieldStoreAccessControlHandler extends EntityAccessControlHandler {
         if($account->id() == $entity->getAdminId()){
           return AccessResult::allowedIfHasPermission($account, "administer validated field entities")->cachePerUser();
         }
-        if ($entity->isFinalized() &&in_array($account->id(),$entity->validated_field->entity->stage->entity->content_workflow->getTalentIds())) {
+        if ($entity->isFinalized() &&in_array($account->id(),$entity->validated_field->entity->stage->entity->content_workflow->entity->getTalentIds())) {
           return AccessResult::allowedIfHasPermission($account, 'view published validated field entities')->cachePerUser();
         }
         return AccessResult::neutral()->cachePerUser();
@@ -49,10 +49,7 @@ class FieldStoreAccessControlHandler extends EntityAccessControlHandler {
         }
         return AccessResult::neutral()->cachePerUser();
       case 'delete':
-        if($entity->isFinalized()){
-          return AccessResult::neutral()->cachePerUser();
-        }
-        return AccessResult::allowedIfHasPermission($account, 'administer validated field entities')->cachePerUser();
+        return AccessResult::allowedIfHasPermission($account, $admin_permission)->cachePerUser();
     }
     return AccessResult::neutral()->cachePerUser();
   }
