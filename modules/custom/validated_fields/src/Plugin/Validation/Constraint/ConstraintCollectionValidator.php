@@ -43,6 +43,47 @@ class ConstraintCollectionValidator extends ConstraintValidator {
       "integer"
     ]
   );
+
+  //object that associates fields with possible validation
+  const ALLOWED_FIELDS = array(
+    "text" => array(
+      "requiredWords",
+      "blacklist",
+      "length"
+    ),
+    "string" => array(
+      "requiredWords",
+      "blacklist",
+      "length"
+    ),
+    "string_long" => array(
+      "requiredWords",
+      "blacklist",
+      "length"
+    ),
+    "text_long" => array(
+      "requiredWords",
+      "blacklist",
+      "length"
+    ),
+    "text_with_summary" => array(
+      "requiredWords",
+      "blacklist",
+      "length"
+    ),
+    "password" => array(
+      "length"
+    ),
+    "decimal" => array(
+      "notNegative"
+    ),
+    "float" => array(
+      "notNegative"
+    ),
+    "integer" => array(
+      "notNegative"
+    ),
+  );
 //validations
 
 //length
