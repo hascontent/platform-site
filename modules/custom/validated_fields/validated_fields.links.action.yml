@@ -24,3 +24,13 @@ entity.content_workflow.add_form:
   title: 'Add Content Workflow'
   appears_on:
     - entity.content_workflow.collection
+entity.stage_action.add_form:
+  route_name: entity.stage_action.add_form
+  title: 'Add Stage action'
+  appears_on:
+    - entity.stage_action.collection
+entity.workflow_template.add_form:
+  route_name: entity.workflow_template.add_form
+  title: 'Add Workflow template'
+  appears_on:
+    - entity.workflow_template.collection

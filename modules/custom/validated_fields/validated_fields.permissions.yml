@@ -44,3 +44,44 @@ view unpublished content workflow entities:
 
 view published content workflow entities:
   title: 'View published content workflow entities'
+
+add stage action entities:
+  title: 'Create new Stage action entities'
+
+administer stage action entities:
+  title: 'Administer Stage action entities'
+  description: 'Allow to access the administration form to configure Stage action entities.'
+  restrict access: true
+
+delete stage action entities:
+  title: 'Delete Stage action entities'
+
+edit stage action entities:
+  title: 'Edit Stage action entities'
+
+view published stage action entities:
+  title: 'View published Stage action entities'
+
+view unpublished stage action entities:
+  title: 'View unpublished Stage action entities'
+
+add workflow template entities:
+  title: 'Create new Workflow template entities'
+
+administer workflow template entities:
+  title: 'Administer Workflow template entities'
+  description: 'Allow to access the administration form to configure Workflow template entities.'
+  restrict access: true
+
+delete workflow template entities:
+  title: 'Delete Workflow template entities'
+
+edit workflow template entities:
+  title: 'Edit Workflow template entities'
+
+view published workflow template entities:
+  title: 'View published Workflow template entities'
+
+view unpublished workflow template entities:
+  title: 'View unpublished Workflow template entities'
+

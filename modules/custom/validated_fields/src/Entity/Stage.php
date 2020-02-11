@@ -206,7 +206,7 @@ class Stage extends ContentEntityBase implements StageInterface {
       ->setDisplayConfigurable('form', TRUE)
       ->setCardinality(-1); //infinite cardinality
     $fields['content_workflow'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Content Workflow'))
+      ->setLabel(t('Workflow'))
       ->setDescription(t('The workflow this stage is a part of'))
       ->setSetting('target_type','content_workflow')
       ->setSetting('handler','default')

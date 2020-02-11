@@ -81,3 +81,45 @@ entity.content_workflow.delete_form:
   base_route:  entity.content_workflow.canonical
   title: Delete
   weight: 10
+# Stage action routing definition
+stage_action.settings_tab:
+  route_name: stage_action.settings
+  title: 'Settings'
+  base_route: stage_action.settings
+
+entity.stage_action.canonical:
+  route_name: entity.stage_action.canonical
+  base_route: entity.stage_action.canonical
+  title: 'View'
+
+entity.stage_action.edit_form:
+  route_name: entity.stage_action.edit_form
+  base_route: entity.stage_action.canonical
+  title: 'Edit'
+
+entity.stage_action.delete_form:
+  route_name:  entity.stage_action.delete_form
+  base_route:  entity.stage_action.canonical
+  title: Delete
+  weight: 10
+# Workflow template routing definition
+workflow_template.settings_tab:
+  route_name: workflow_template.settings
+  title: 'Settings'
+  base_route: workflow_template.settings
+
+entity.workflow_template.canonical:
+  route_name: entity.workflow_template.canonical
+  base_route: entity.workflow_template.canonical
+  title: 'View'
+
+entity.workflow_template.edit_form:
+  route_name: entity.workflow_template.edit_form
+  base_route: entity.workflow_template.canonical
+  title: 'Edit'
+
+entity.workflow_template.delete_form:
+  route_name:  entity.workflow_template.delete_form
+  base_route:  entity.workflow_template.canonical
+  title: Delete
+  weight: 10

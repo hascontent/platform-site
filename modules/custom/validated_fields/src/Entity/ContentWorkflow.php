@@ -239,7 +239,19 @@ class ContentWorkflow extends ContentEntityBase implements ContentWorkflowInterf
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE)
       ->setCardinality(-1);
-      return $fields;
+
+    $fields['current_stage'] = BaseFieldDefinition::create('entity_reference')
+      ->setSetting('target_type','stage')
+      ->setSetting('handler','default')
+      ->setCardinality(1);
+
+    $fields['workflow_template'] = BaseFieldDefinition::create('entity_reference')
+      ->setSetting('target_type','workflow_template')
+      ->setSetting('handler','default')
+      ->setCardinality(1)
+      ->setRequired(TRUE);
+
+    return $fields;
   }
 
 }
