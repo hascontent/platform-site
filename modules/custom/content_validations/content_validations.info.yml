@@ -1,4 +1,6 @@
 name: 'content_validations'
+dependencies:
+  - drupal:rest
 type: module
 description: 'validations that can be flexibly used by module developers'
 core: 8.x
