@@ -13,7 +13,7 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 class ConstraintCollectionValidator extends ConstraintValidator {
   //object that declares which validations can be associated with which fields
-  const ALLOWED_VALIDATIONS = array(
+  const VALIDATIONS_LIST = array(
     "length" => [
       "text",
       "email",
@@ -45,7 +45,7 @@ class ConstraintCollectionValidator extends ConstraintValidator {
   );
 
   //object that associates fields with possible validation
-  const VALIDATIONS_LIST = array(
+  const ALLOWED_VALIDATIONS = array(
     "fields" => array(
       "text" => array(
         "requiredWords",
@@ -138,11 +138,11 @@ class ConstraintCollectionValidator extends ConstraintValidator {
      return;
    }
    foreach($entity->getValidations() as $validation => $params){
-     if(!isSet(self::ALLOWED_VALIDATIONS[$validation])){
+     if(!isSet(self::VALIDATIONS_LIST[$validation])){
        $this->context->addViolation($constraint->nonexistentValidation, ['%validation' => $validation]);
        continue;
      }
-       if(!in_array($type,self::ALLOWED_VALIDATIONS[$validation])){
+       if(!in_array($type,self::VALIDATIONS_LIST[$validation])){
        $this->context->addViolation($constraint->incorrectValidation, ['%validation' => $validation, '%field' => $type]);
      }
    }
