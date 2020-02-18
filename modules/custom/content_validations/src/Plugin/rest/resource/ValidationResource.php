@@ -96,24 +96,24 @@ class ValidationResource extends ResourceBase {
     $this->validation_manager = $validation_manager;
   }
 
-    /**
-     * Responds to GET requests.
-     *
-     * @param string $payload
-     *
-     * @return ResourceResponse
-     *   The HTTP response object.
-     *
-     * @throws HttpException
-     *   Throws exception expected.
-     */
-    public function get($payload) {
-        // You must to implement the logic of your REST Resource here.
-        // Use current user after pass authentication to validate access.
-        if (!$this->currentUser->hasPermission('access content')) {
-            throw new AccessDeniedHttpException();
-        }
-         $validations = $this->validation_manager->getDefinitions();
-        return new ResourceResponse($validations, 200);
+  /**
+   * Responds to GET requests.
+   *
+   * @param string $payload
+   *
+   * @return ResourceResponse
+   *   The HTTP response object.
+   *
+   * @throws HttpException
+   *   Throws exception expected.
+   */
+  public function get($payload) {
+    // You must to implement the logic of your REST Resource here.
+    // Use current user after pass authentication to validate access.
+    if (!$this->currentUser->hasPermission('access content')) {
+        throw new AccessDeniedHttpException();
     }
+    $validations = $this->validation_manager->getDefinitions();
+    return new ResourceResponse($validations, 200);
+  }
 }
