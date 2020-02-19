@@ -1,0 +1,24 @@
+<?php
+
+/**
+ * @file
+ * Contains content_validations.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function content_validations_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the content_validations module.
+    case 'help.page.content_validations':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('validations that can be flexibly used by module developers') . '</p>';
+      return $output;
+
+    default:
+  }
+}

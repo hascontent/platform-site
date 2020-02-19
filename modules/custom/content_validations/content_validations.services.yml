@@ -1,0 +1,4 @@
+services:
+  plugin.manager.validation_plugin:
+    class: Drupal\content_validations\Plugin\ValidationPluginManager
+    parent: default_plugin_manager

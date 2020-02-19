@@ -219,12 +219,14 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
       }
       return $messages;
     }
+
+
   /// Constraint Collection
   public function validateCollection(){
     $messages = [];
     foreach ($this->getValidations() as $validation => $params) {
-      $value = $this->getFieldValue();
-      array_merge($messages, $this->$validation($params));
+      $validation_plugin = \Drupal::service('plugin.manager.validation_plugin')->createInstance($validation);
+      array_merge($messages, $validation_plugin->validate($this->storage->entity->getFieldItem(),$params));
     }
     return $messages;
   }

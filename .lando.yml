@@ -5,9 +5,9 @@ config:
   php: '7.3'
   via: apache
   framework: drupal8
-  xdebug: true
-  config:
-    php: .lando.php.ini
+  # xdebug: true
+  # config:
+  #   php: .lando.php.ini
 
 services:
   my-service:
@@ -16,8 +16,8 @@ services:
       - database
   database:
     type: mysql
-  appserver:
-    overrides:
-      environment:
-        # Support debugging Drush with XDEBUG.
-        PHP_IDE_CONFIG: "serverName=appserver"
+  # appserver:
+  #   overrides:
+  #     environment:
+  #       # Support debugging Drush with XDEBUG.
+  #       PHP_IDE_CONFIG: "serverName=appserver"

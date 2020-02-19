@@ -1,0 +1,13 @@
+{
+    "name": "content_validations",
+    "type": "drupal-module",
+    "description": "validations that can be flexibly used by module developers",
+    "keywords": [
+    ],
+    "homepage": "https://www.drupal.org/project/content_validations",
+    "minimum-stability": "dev",
+    "support": {
+        "issues": "https://www.drupal.org/project/issues/content_validations",
+        "source": "http://cgit.drupalcode.org/content_validations",
+    },
+}
