@@ -15,6 +15,11 @@ use Drupal\Core\Field\FieldItemInterface;
  *       "label" = "Words",
  *       "input" = "text",
  *     },
+ *     "occurrences" = {
+ *       "id" = "occurrences",
+ *       "label" = "words",
+ *       "input" = "text",
+ *     }
  *   },
  *   allowed_fields = {
  *     "text",
@@ -44,7 +49,7 @@ class RequiredWords extends ValidationPluginBase {
     $text = $field->value;
     $words = explode( ", ", $params["words"]);
     foreach($words as $word){
-      if(!preg_match("/\b{$word}\b/i",$text)){
+      if(preg_match_all("/\b{$word}\b/i",$text) < $params["occurrences"]){
           array_push($messages,"Word is required: '$word'");
       }
     }
