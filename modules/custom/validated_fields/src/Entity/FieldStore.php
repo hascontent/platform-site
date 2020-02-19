@@ -71,6 +71,10 @@ class FieldStore extends ContentEntityBase implements FieldStoreInterface{
     return $this->get($this->getTypeId())->value;
   }
 
+  public function getFieldItem(){
+    return $this->get($this->getTypeId())[0];
+  }
+
   public function setValue($value){
     $this->set($this->getTypeId(),$value);
     return $this;

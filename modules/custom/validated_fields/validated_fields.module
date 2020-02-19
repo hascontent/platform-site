@@ -50,10 +50,11 @@ function validated_fields_install(){
     ));
     $field_config->save();
   }
-
-  //extra Programming QOL stuff
-//  Entity\ValidatedFieldType::factory("testname",array("test" => "validations"));
-//  Entity\ValidatedField::factory("testvf", "text");
+    $category = \Drupal::EntityTypeManager()->getStorage('taxonomy_term')->create(["vid" => "field_categories", "name" => "default"]);
+    $category->save();
+    $vft = \Drupal::EntityTypeManager()->getStorage("validated_field_type")->create(["field_type" => "text", "category" => "default", "name" => "default text"]);
+    $vft->save();
+    
 }
 
 function validated_fields_entity_type_alter( &$entity_types){
