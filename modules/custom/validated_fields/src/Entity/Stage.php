@@ -214,6 +214,13 @@ class Stage extends ContentEntityBase implements StageInterface {
       ->setDisplayConfigurable('form', TRUE)
       ->setRequired(TRUE)
       ->setCardinality(1);
+
+    $fields['actions'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Actions'))
+      ->setDescription(t('Actions allow users to perform certain actions from there stage'))
+      ->setSetting('target_type','stage_action')
+      ->setSetting('handler','default');
+  
     return $fields;
   }
 

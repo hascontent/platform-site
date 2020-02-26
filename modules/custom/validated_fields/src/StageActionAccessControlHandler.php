@@ -24,11 +24,6 @@ class StageActionAccessControlHandler extends EntityAccessControlHandler {
 
       case 'view':
 
-        if (!$entity->isPublished()) {
-          return AccessResult::allowedIfHasPermission($account, 'view unpublished stage action entities');
-        }
-
-
         return AccessResult::allowedIfHasPermission($account, 'view published stage action entities');
 
       case 'update':

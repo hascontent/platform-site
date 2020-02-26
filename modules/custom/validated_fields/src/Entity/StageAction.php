@@ -5,7 +5,6 @@ namespace Drupal\validated_fields\Entity;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
-use Drupal\Core\Entity\EntityPublishedTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
 
 /**
@@ -86,6 +85,20 @@ class StageAction extends ContentEntityBase implements StageActionInterface {
   }
 
   /**
+   * trigger the triggered events
+   */
+  public function triggerEvents() {
+    $eventList = $this->triggered_events;
+    $offset = 0;
+    while($eventList->offsetExists($offset)){
+      $event = $eventList->offsetGet($offset);
+      $triggered_event = \Drupal::service('plugin.manager.triggered_events')->createInstance($event->id);
+      $triggered_event->execute($event->params);
+      $offset++;
+    }
+  }
+
+  /**
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
@@ -115,18 +128,27 @@ class StageAction extends ContentEntityBase implements StageActionInterface {
       ->setDisplayConfigurable('view', TRUE)
       ->setRequired(TRUE);
 
-    $fields['created'] = BaseFieldDefinition::create('created')
+  $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))
       ->setDescription(t('The time that the entity was created.'));
 
-    $fields['changed'] = BaseFieldDefinition::create('changed')
+  $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Changed'))
       ->setDescription(t('The time that the entity was last edited.'));
 
-    $fields["next_stage"] = BaseFieldDefinition::create('entity_reference')
+  $fields["next_stage"] = BaseFieldDefinition::create('entity_reference')
     ->setSetting('target_type','stage')
     ->setSetting('handler','default')
-    ->setCardinality(1);
+    ->setCardinality(3);
+
+  $fields["triggered_events"] = BaseFieldDefinition::create('map')
+    ->setLabel(t('Triggerred Events'))
+    ->setDescription(t('events triggered by stage actions'))
+    ->setDisplayOptions('form' , [
+      'label' => 'Validations',
+      'weight' => -1,
+      'type' => 'map_assoc_widget'
+    ]);
 
     return $fields;
   }
