@@ -249,7 +249,8 @@ class ContentWorkflow extends ContentEntityBase implements ContentWorkflowInterf
       ->setSetting('target_type','workflow_template')
       ->setSetting('handler','default')
       ->setCardinality(1)
-      ->setRequired(TRUE);
+      // ->setRequired(TRUE)
+      ;
 
     return $fields;
   }
