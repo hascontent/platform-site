@@ -26,8 +26,9 @@ function validated_fields_help($route_name, RouteMatchInterface $route_match) {
 function validated_fields_install(){
   $defs = \Drupal::service('plugin.manager.field.field_type')->getDefinitions();
   $base_field_types = \Drupal::EntityTypeManager()->getStorage('field_storage_config')->loadByProperties(["entity_type" => "node"]);
+  $forbidden_fields = ["file_uri" => TRUE, "uuid" => TRUE, "path" => TRUE, "map" => TRUE, "created" => TRUE, "changed" => TRUE, "comment" => TRUE, "password" => TRUE, "language" => TRUE, "uuid" => TRUE, "entity_reference" => TRUE];
   foreach($defs as $field_name => $field_type){
-    if($field_name == "uuid" || $field_name == "path" || $field_name == "map"){
+    if($forbidden_fields[$field_name] === TRUE || strpos($field_name, "list") !== false){
       continue;
     }
     $field_store_type = \Drupal::EntityTypeManager()->getStorage('field_store_type')->create(
