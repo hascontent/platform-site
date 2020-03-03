@@ -148,7 +148,8 @@ class StageAction extends ContentEntityBase implements StageActionInterface {
       'label' => 'Validations',
       'weight' => -1,
       'type' => 'map_assoc_widget'
-    ]);
+    ])
+    ->setCardinality(-1);
 
     return $fields;
   }
