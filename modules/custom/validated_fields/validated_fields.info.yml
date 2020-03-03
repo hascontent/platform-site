@@ -3,7 +3,7 @@ type: module
 dependencies:
   - drupal:rest
   - custom:content_validations
-description: 'Entities built on paragraphs meant to field content with custom validations and permissions on each field'
+description: 'Entities meant to field content with custom validations and permissions on each field'
 core: 8.x
 package: 'Custom'
 
