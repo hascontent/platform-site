@@ -17,7 +17,7 @@ use Drupal\Core\Field\FieldItemInterface;
  *     },
  *     "occurrences" = {
  *       "id" = "occurrences",
- *       "label" = "words",
+ *       "label" = "Occurrences",
  *       "input" = "text",
  *     }
  *   },
