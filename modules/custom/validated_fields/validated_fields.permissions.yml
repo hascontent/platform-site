@@ -85,3 +85,23 @@ view published workflow template entities:
 view unpublished workflow template entities:
   title: 'View unpublished Workflow template entities'
 
+add stage instance entities:
+  title: 'Create new Stage Instance entities'
+
+administer stage instance entities:
+  title: 'Administer Stage Instance entities'
+  description: 'Allow to access the administration form to configure Stage Instance entities.'
+  restrict access: true
+
+delete stage instance entities:
+  title: 'Delete Stage Instance entities'
+
+edit stage instance entities:
+  title: 'Edit Stage Instance entities'
+
+view published stage instance entities:
+  title: 'View published Stage Instance entities'
+
+view unpublished stage instance entities:
+  title: 'View unpublished Stage Instance entities'
+

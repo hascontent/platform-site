@@ -338,7 +338,7 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
       ->setLabel(t('Comments'))
       ->setDescription(t('comments on field'))
       ->setDisplayOptions('form' , [
-        'label' => 'Validations',
+        'label' => 'Comments',
         'weight' => -1,
         'type' => 'map_assoc_widget'
       ]);
@@ -364,7 +364,7 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
     $fields['stage'] = BaseFieldDefinition::create("entity_reference")
       ->setLabel(t('Type'))
       ->setDescription(t('The stage that owns this validated field'))
-      ->setSetting('target_type','stage')
+      ->setSetting('target_type','stage_instance')
       ->setSetting('handler','default')
       ->setDisplayOptions('form', array(
         'type'     => 'entity_reference_autocomplete',

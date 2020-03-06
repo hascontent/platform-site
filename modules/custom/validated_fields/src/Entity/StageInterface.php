@@ -12,7 +12,7 @@ use Drupal\user\EntityOwnerInterface;
  *
  * @ingroup validated_fields
  */
-interface StageInterface extends ContentEntityInterface, EntityChangedInterface, EntityPublishedInterface, EntityOwnerInterface {
+interface StageInterface extends ContentEntityInterface, EntityChangedInterface {
 
   /**
    * Add get/set methods for your configuration properties here.
