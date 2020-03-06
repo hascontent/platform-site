@@ -6,7 +6,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
-
+use Drupal\Core\Entity\EntityStorageInterface;
 /**
  * Defines the Validated field type entity.
  *
@@ -38,6 +38,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *     "id" = "id",
  *     "label" = "name",
  *     "uuid" = "uuid",
+ *     "uid" = "user_id",
  *   },
  *   links = {
  *     "canonical" = "/validated-fields/validated_field_type/{validated_field_type}",
@@ -52,6 +53,16 @@ use Drupal\Core\Entity\EntityTypeInterface;
 class ValidatedFieldType extends ContentEntityBase implements ValidatedFieldTypeInterface {
 
   use EntityChangedTrait;
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
+    parent::preCreate($storage_controller, $values);
+    $values += [
+      'user_id' => \Drupal::currentUser()->id(),
+    ];
+  }
 
   /**
    *
@@ -123,6 +134,36 @@ class ValidatedFieldType extends ContentEntityBase implements ValidatedFieldType
     return $this;
   }
 
+    /**
+   * {@inheritdoc}
+   */
+  public function getOwner() {
+    return $this->get('user_id')->entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getOwnerId() {
+    return $this->get('user_id')->target_id;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setOwnerId($uid) {
+    $this->set('user_id', $uid);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setOwner(UserInterface $account) {
+    $this->set('user_id', $account->id());
+    return $this;
+  }
+
   /**
    * {@inheritdoc}
    */
@@ -149,6 +190,30 @@ class ValidatedFieldType extends ContentEntityBase implements ValidatedFieldType
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE)
       ->setRequired(TRUE);
+
+    $fields['user_id'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Authored by'))
+      ->setDescription(t('The user ID of author of the Content Workflow entity.'))
+      ->setRevisionable(TRUE)
+      ->setSetting('target_type', 'user')
+      ->setSetting('handler', 'default')
+      ->setDisplayOptions('view', [
+        'label' => 'hidden',
+        'type' => 'author',
+        'weight' => 0,
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'entity_reference_autocomplete',
+        'weight' => 5,
+        'settings' => [
+          'match_operator' => 'CONTAINS',
+          'size' => '60',
+          'autocomplete_type' => 'tags',
+          'placeholder' => '',
+        ],
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
 
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))
