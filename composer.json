@@ -16,8 +16,6 @@
     ],
     "require": {
         "composer/installers": "^1.2",
-        "drupal/cas": "^1.6",
-        "drupal/console": "~1.0",
         "drupal/core-composer-scaffold": "^8.8",
         "drupal/core-project-message": "^8.8",
         "drupal/core-recommended": "^8.8",
