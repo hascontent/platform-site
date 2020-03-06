@@ -1,0 +1,174 @@
+diff --git a/core/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorage.php b/core/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorage.php
+index 083ce84ccf..a246697e89 100644
+--- a/core/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorage.php
++++ b/core/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorage.php
+@@ -1284,8 +1284,19 @@ protected function loadFromDedicatedTables(array &$values, $load_from_revision)
+             // prefixed database column.
+             foreach ($storage_definition->getColumns() as $column => $attributes) {
+               $column_name = $table_mapping->getFieldColumnName($storage_definition, $column);
+-              // Unserialize the value if specified in the column schema.
+-              $item[$column] = (!empty($attributes['serialize'])) ? unserialize($row->$column_name) : $row->$column_name;
++              // If there is no main property and only a single column that is
++              // serialized, put the values directly into the $item without the
++              // column.
++              $column_is_serialized = !empty($attributes['serialize']);
++              // @todo Give field types more control over this behavior in
++              //   https://www.drupal.org/node/2232427.
++              if (!$storage_definition->getMainPropertyName() && count($storage_definition->getColumns()) == 1 && $column_is_serialized) {
++                $item = unserialize($row->$column_name);
++              }
++              else {
++                // Unserialize the value if specified in the column schema.
++                $item[$column] = $column_is_serialized ? unserialize($row->$column_name) : $row->$column_name;
++              }
+             }
+ 
+             // Add the item to the field values for the entity.
+@@ -1388,10 +1399,20 @@ protected function saveToDedicatedTables(ContentEntityInterface $entity, $update
+           ];
+           foreach ($storage_definition->getColumns() as $column => $attributes) {
+             $column_name = $table_mapping->getFieldColumnName($storage_definition, $column);
+-            // Serialize the value if specified in the column schema.
+-            $value = $item->$column;
+-            if (!empty($attributes['serialize'])) {
+-              $value = serialize($value);
++            // If there is no main property and only a single column that is
++            // serialized, serialize all the values from the field item.
++            // @todo Give field types more control over this behavior in
++            //   https://www.drupal.org/node/2232427.
++            $column_is_serialized = !empty($attributes['serialize']);
++            if (!$storage_definition->getMainPropertyName() && count($storage_definition->getColumns()) == 1 && $column_is_serialized) {
++              $value = serialize($item->getValue());
++            }
++            else {
++              $value = $item->$column;
++              // Serialize the value if specified in the column schema.
++              if ($column_is_serialized) {
++                $value = serialize($value);
++              }
+             }
+             $record[$column_name] = SqlContentEntityStorageSchema::castValue($attributes, $value);
+           }
+diff --git a/core/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorageSchema.php b/core/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorageSchema.php
+index a3454fc365..5c13389582 100644
+--- a/core/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorageSchema.php
++++ b/core/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorageSchema.php
+@@ -2367,7 +2367,10 @@ protected function getDedicatedTableSchema(FieldStorageDefinitionInterface $stor
+       // A dedicated table only contain rows for actual field values, and no
+       // rows for entities where the field is empty. Thus, we can safely
+       // enforce 'not null' on the columns for the field's required properties.
+-      $data_schema['fields'][$real_name]['not null'] = $properties[$column_name]->isRequired();
++      // @todo https://www.drupal.org/project/drupal/issues/2887105
++      if (isset($properties[$column_name])) {
++        $data_schema['fields'][$real_name]['not null'] = $properties[$column_name]->isRequired();
++      }
+     }
+ 
+     // Add indexes.
+diff --git a/core/modules/field/tests/src/Kernel/MapItemTest.php b/core/modules/field/tests/src/Kernel/MapItemTest.php
+new file mode 100644
+index 0000000000..5b3f3eda91
+--- /dev/null
++++ b/core/modules/field/tests/src/Kernel/MapItemTest.php
+@@ -0,0 +1,101 @@
++<?php
++
++namespace Drupal\Tests\field\Kernel;
++
++use Drupal\Core\Entity\EntityInterface;
++use Drupal\entity_test\Entity\EntityTest;
++use Drupal\entity_test\Entity\EntityTestMapField;
++use Drupal\field\Entity\FieldConfig;
++use Drupal\field\Entity\FieldStorageConfig;
++
++/**
++ * Tests the map field type.
++ *
++ * @group field
++ */
++class MapItemTest extends FieldKernelTestBase {
++
++  /**
++   * The name of the field to use in this test.
++   *
++   * @var string
++   */
++  protected $fieldName = 'field_test';
++
++  /**
++   * {@inheritdoc}
++   */
++  protected function setUp() {
++    parent::setUp();
++
++    // Install the schema for the entity type with a "map" base field.
++    // @see \Drupal\Tests\field\Kernel\MapItemTest::testMapBaseField()
++    $this->installEntitySchema('entity_test_map_field');
++
++    // Set up a configurable "map" field.
++    // @see \Drupal\Tests\field\Kernel\MapItemTest::testMapFieldConfigurable()
++    FieldStorageConfig::create([
++      'field_name' => $this->fieldName,
++      'entity_type' => 'entity_test',
++      'type' => 'map',
++    ])->save();
++    FieldConfig::create([
++      'entity_type' => 'entity_test',
++      'field_name' => $this->fieldName,
++      'bundle' => 'entity_test',
++    ])->save();
++  }
++
++  /**
++   * Tests properties of a map field that is a base field.
++   */
++  public function testMapBaseField() {
++    $entity = EntityTestMapField::create();
++    $entity->data->test1 = 'value1';
++    $entity->data->test2 = 'value2';
++    $entity->data->test_array = ['nested' => 'structure'];
++    $entity->save();
++
++    $this->assertMapField($entity, 'data');
++  }
++
++  /**
++   * Tests properties of a map field that is a configurable field.
++   */
++  public function testMapFieldConfigurable() {
++    $entity = EntityTest::create();
++    $entity->field_test->test1 = 'value1';
++    $entity->field_test->test2 = 'value2';
++    $entity->field_test->test_array = ['nested' => 'structure'];
++
++    $this->assertMapField($entity, 'field_test');
++  }
++
++  /**
++   * Asserts using properties of the map field type.
++   */
++  protected function assertMapField(EntityInterface $entity, $field_name) {
++    $entity_type_id = $entity->getEntityTypeId();
++    $entity_storage = $this->container->get('entity_type.manager')->getStorage($entity_type_id);
++
++    $entity->name->value = $this->randomMachineName();
++    $entity->save();
++
++    // Verify entity has been created properly.
++    $id = $entity->id();
++    $entity = $entity_storage->load($id);
++    $this->assertEquals('value1', $entity->$field_name->test1);
++    $this->assertEquals('value2', $entity->$field_name->test2);
++    $this->assertEquals(['nested' => 'structure'], $entity->$field_name->test_array);
++
++    // Verify changing the field value.
++    $entity->$field_name->test1 = 'new_value';
++    $this->assertEquals('new_value', $entity->$field_name->test1);
++
++    // Read changed entity and assert changed values.
++    $entity->save();
++    $entity = $entity_storage->load($id);
++    $this->assertEquals('new_value', $entity->$field_name->test1);
++  }
++
++}
