@@ -88,13 +88,11 @@ class StageAction extends ContentEntityBase implements StageActionInterface {
    * trigger the triggered events
    */
   public function triggerEvents() {
-    $eventList = $this->triggered_events;
-    $offset = 0;
-    while($eventList->offsetExists($offset)){
-      $event = $eventList->offsetGet($offset);
-      $triggered_event = \Drupal::service('plugin.manager.triggered_events')->createInstance($event->id);
-      $triggered_event->execute($event->params);
-      $offset++;
+    $eventList = $this->triggered_events[0]->toArray();
+    foreach($eventList as $val){
+      $event = $val;
+      $triggered_event = \Drupal::service('plugin.manager.triggered_events')->createInstance($event["id"]);
+      $triggered_event->execute($event["params"]);
     }
   }
 
@@ -149,7 +147,7 @@ class StageAction extends ContentEntityBase implements StageActionInterface {
       'weight' => -1,
       'type' => 'map_assoc_widget'
     ])
-    ->setCardinality(-1);
+    ->setCardinality(1);
 
     return $fields;
   }
