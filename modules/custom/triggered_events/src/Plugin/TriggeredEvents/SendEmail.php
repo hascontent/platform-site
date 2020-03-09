@@ -34,9 +34,11 @@ class SendEmail extends TriggeredEventsBase {
     $mailManager = \Drupal::service('plugin.manager.mail');
     $module = 'triggered_events';
     $key = 'my_mail'; // Replace with Your key
-    $to = $params["to"];
-    $params['message'] = $params["body"];
-    $params['title'] = $params["subject"];
+    $to = $params["to"] ?? \Drupal::currentUser()->getEmail() ?? "noemail";
+    $params['message'] = $params["body"] ?? "";
+    if(!array_key_exists("from", $params))
+      $params["from"] = "noemail";
+    $params['title'] = $params["subject"] ?? "";
     $langcode = \Drupal::currentUser()->getPreferredLangcode();
     $send = true;
   
@@ -48,7 +50,7 @@ class SendEmail extends TriggeredEventsBase {
       return;
     }
   
-    $message = t('An email notification has been sent to @email ', array('@email' => $to));
+    $message = t('An email notification has been sent to @email from @from', array('@email' => $to, '@from' => $params["from"]));
     drupal_set_message($message);
     \Drupal::logger('mail-log')->notice($message);
   }
