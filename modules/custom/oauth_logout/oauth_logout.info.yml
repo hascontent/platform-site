@@ -1,0 +1,7 @@
+name: 'Oauth Logout'
+type: module
+description: 'adds a logout route to the simple oauth module'
+dependencies:
+ - simple_oauth
+core: 8.x
+package: 'Custom'

@@ -1,0 +1,13 @@
+{
+    "name": "oauth_logout",
+    "type": "drupal-module",
+    "description": "adds a logout route to the simple oauth module",
+    "keywords": [
+    ],
+    "homepage": "https://www.drupal.org/project/oauth_logout",
+    "minimum-stability": "dev",
+    "support": {
+        "issues": "https://www.drupal.org/project/issues/oauth_logout",
+        "source": "http://cgit.drupalcode.org/oauth_logout",
+    },
+}

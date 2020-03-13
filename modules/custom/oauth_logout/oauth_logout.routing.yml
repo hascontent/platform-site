@@ -1,0 +1,7 @@
+oauth_logout.logout:
+  path: '/oauth/logout'
+  defaults:
+    _controller: 'Drupal\oauth_logout\Controller\OauthLogoutController::logout'
+  methods: [POST]
+  requirements:
+    _access: 'TRUE'
