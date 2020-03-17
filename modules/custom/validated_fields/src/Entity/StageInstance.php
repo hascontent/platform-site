@@ -34,15 +34,12 @@ use Drupal\user\UserInterface;
  *     "uuid" = "uuid",
  *     "uid" = "user_id",
  *     "langcode" = "langcode",
- *     "published" = "status",
  *   },
  * )
  */
 class StageInstance extends ContentEntityBase implements StageInstanceInterface {
 
   use EntityChangedTrait;
-  use EntityPublishedTrait;
-
 
   /**
    * {@inheritdoc}
@@ -113,7 +110,6 @@ class StageInstance extends ContentEntityBase implements StageInstanceInterface 
     $fields = parent::baseFieldDefinitions($entity_type);
 
     // Add the published field.
-    $fields += static::publishedBaseFieldDefinitions($entity_type);
 
     $fields['name'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Name'))
@@ -136,11 +132,10 @@ class StageInstance extends ContentEntityBase implements StageInstanceInterface 
       ->setDisplayConfigurable('view', TRUE)
       ->setRequired(TRUE);
 
-    $fields['status']->setDescription(t('A boolean indicating whether the Stage Instance is published.'))
-      ->setDisplayOptions('form', [
-        'type' => 'boolean_checkbox',
-        'weight' => -3,
-      ]);
+    $fields['status'] = BaseFieldDefinitions::create('integer')
+      ->label(t("Status"))
+      ->setDescription(t('A integer indicating the state of the stage instance.'))
+      ->addPropertyConstraints('value',['Range'=> ['min' => 0, 'max' => 2]]);
 
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))
@@ -182,6 +177,12 @@ class StageInstance extends ContentEntityBase implements StageInstanceInterface 
       ->setReadOnly(TRUE)
       ->setDisplayConfigurable('form', TRUE)
       ->setCardinality(-1); //infinite cardinality
+
+    $fields["stage_template"] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t("Stage Template"))
+      ->setDescription(t("The settings and name of the stage"))
+      ->setSetting('target_type','stage')
+      ->setSetting('handler','default');
     return $fields;
   }
 
