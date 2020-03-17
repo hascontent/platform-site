@@ -271,8 +271,7 @@ class ValidatedFieldType extends ContentEntityBase implements ValidatedFieldType
         ),
       ))
       ->setDisplayConfigurable('form', TRUE)
-      ->setRequired(TRUE);
-
+      ->setCardinality(-1);
     return $fields;
   }
 
