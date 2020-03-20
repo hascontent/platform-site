@@ -64,6 +64,7 @@ class ValidatedFieldType extends ContentEntityBase implements ValidatedFieldType
     ];
   }
 
+    
   /**
    *
    * factory method for testing purposes

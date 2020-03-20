@@ -84,7 +84,7 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
     return $this->permission_level->value;
   }
   public function getFieldStore(){
-    if(!isSet($this->storage->target_id)){
+    if(!isSet($this->storage->entity)){
       throw new \Exception("trying to reference null field store entity");
     }
     return $this->storage->entity;

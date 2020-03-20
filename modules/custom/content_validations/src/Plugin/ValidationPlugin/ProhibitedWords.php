@@ -42,6 +42,9 @@ class ProhibitedWords extends ValidationPluginBase {
   public function validate(FieldItemInterface $field, array $params){
     $messages = [];
     $text = $field->value;
+    if($params["words"] === ""){
+      return $messages;
+    }
     $words = explode( ", ", $params["words"]);
     foreach($words as $word){
       if(preg_match("/\b{$word}\b/i",$text)){

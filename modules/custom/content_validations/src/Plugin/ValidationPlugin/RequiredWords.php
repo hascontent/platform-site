@@ -46,10 +46,17 @@ class RequiredWords extends ValidationPluginBase {
    */
   public function validate(FieldItemInterface $field, array $params){
     $messages = [];
+    if($params["words"] === ""){
+      return $messages;
+    }
     $text = $field->value;
+    $occurrences = 1;
+    if(isSet($params["occurrences"])){
+      $occurrences = $params["occurrences"];
+    }
     $words = explode( ", ", $params["words"]);
     foreach($words as $word){
-      if(preg_match_all("/\b{$word}\b/i",$text) < $params["occurrences"]){
+      if(preg_match_all("/\b{$word}\b/i",$text) < $occurrences){
           array_push($messages,"Word is required: '$word'");
       }
     }
