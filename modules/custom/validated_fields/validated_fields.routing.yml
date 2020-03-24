@@ -109,3 +109,75 @@ entity.validated_field_type.delete_form:
     _title: 'Delete Field Store'
   requirements:
     _entity_access: 'validated_field_type.delete'
+
+entity.content_workflow.collection:
+  path: '/vf/cw/list'
+  defaults:
+    _entity_list: 'content_workflow'
+    _title: 'list of Content Workflows'
+  requirements:
+    _permission: "administer content"
+
+entity.content_workflow.add_page:
+  path: '/vf/cw/add'
+  defaults:
+    _entity_form: 'content_workflow.add'
+    _title: 'Add Content Workflow'
+  requirements:
+    _entity_create_access: 'content_workflow'
+
+entity.content_workflow.edit_form:
+  path: '/vf/cw/{content_workflow}/edit'
+  defaults:
+    _entity_form: content_workflow.edit
+    _title: "Edit Content Workflow"
+  requirements:
+    _entity_access: 'content_workflow.update'
+
+entity.content_workflow.delete_form:
+  path: '/vf/cw/{content_workflow}/delete'
+  defaults:
+    _entity_form: 'content_workflow.delete'
+    _title: 'Delete Content Workflow'
+  requirements:
+    _entity_access: 'content_workflow.delete'
+
+entity.stage.collection:
+  path: '/vf/s/list'
+  defaults:
+    _entity_list: 'stage'
+    _title: 'list of Stages'
+  requirements:
+    _permission: "administer content"
+
+entity.stage.add_page:
+  path: '/vf/s/add'
+  defaults:
+    _entity_form: 'stage.add'
+    _title: 'Add Stage'
+  requirements:
+    _entity_create_access: 'stage'
+
+entity.stage.edit_form:
+  path: '/vf/s/{stage}/edit'
+  defaults:
+    _entity_form: stage.edit
+    _title: "Edit Stage"
+  requirements:
+    _entity_access: 'stage.update'
+
+entity.stage.delete_form:
+  path: '/vf/s/{stage}/delete'
+  defaults:
+    _entity_form: 'stage.delete'
+    _title: 'Delete Stage'
+  requirements:
+    _entity_access: 'stage.delete'
+
+entity.stage.canonical:
+  path: 'vf/s/{stage}'
+  defaults:
+    _entity_view: 'stage'
+    _title: 'Stage'
+  requirements:
+    _entity_access: 'stage.view'
