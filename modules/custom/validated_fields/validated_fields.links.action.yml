@@ -24,3 +24,9 @@ entity.content_workflow.add_form:
   title: 'Add Content Workflow'
   appears_on:
     - entity.content_workflow.collection
+
+entity.stage.add_page:
+  route_name: entity.stage.add_page
+  title: 'Add Stage'
+  appears_on:
+    - entity.stage.collection
