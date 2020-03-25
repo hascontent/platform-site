@@ -101,7 +101,10 @@ class ValidatedFieldType extends ContentEntityBase implements ValidatedFieldType
   }
 
   public function getValidations(){
-    return $this->validations->getValue()[0];
+    if(isSet($this->validations[0]))
+      return $this->validations->getValue()[0];
+    else
+      return [];
   }
 
 

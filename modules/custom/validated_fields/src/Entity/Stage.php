@@ -248,7 +248,8 @@ class Stage extends ContentEntityBase implements StageInterface {
           'autocomplete_type' => 'tags',
           'placeholder' => '',
         ],
-      ])      ->setRequired(TRUE)
+      ])      
+      ->setRequired(TRUE)
       ->setCardinality(1);
     return $fields;
   }

@@ -121,8 +121,11 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
    *    ...
    *  }
    */
-  public function getValidations(){
-    return $this->validations->getValue()[0];
+public function getValidations(){
+    if(isSet($this->validations[0]))
+      return $this->validations->getValue()[0];
+    else
+      return [];
   }
   public function resetValidations($validations = []){
     $this->validations = $validations;
@@ -226,7 +229,8 @@ class ValidatedField extends ContentEntityBase implements ValidatedFieldInterfac
     $messages = [];
     foreach ($this->getValidations() as $validation => $params) {
       $validation_plugin = \Drupal::service('plugin.manager.validation_plugin')->createInstance($validation);
-      array_merge($messages, $validation_plugin->validate($this->storage->entity->getFieldItem(),$params));
+      $message = $validation_plugin->validate($this->storage->entity->getFieldItem(),$params);
+      $messages = array_merge($messages, $message);
     }
     return $messages;
   }

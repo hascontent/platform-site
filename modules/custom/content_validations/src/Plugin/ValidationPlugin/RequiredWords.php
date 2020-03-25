@@ -7,7 +7,7 @@ use Drupal\Core\Field\FieldItemInterface;
 
 /**
  * Validates that the length of text meets minimum and maximum requirements
- * 
+ *
  * @ValidationPlugin(
  *   input_fields = {
  *     "words" = {
@@ -38,10 +38,10 @@ use Drupal\Core\Field\FieldItemInterface;
 class RequiredWords extends ValidationPluginBase {
   /**
    * The function that validates the field based on parameters and values passed in
-   * 
+   *
    * the field being validated
    * @param \Drupal\Core\Field\FieldItemInterface $field
-   * 
+   *
    * @param array params the array of parameters for the validations
    */
   public function validate(FieldItemInterface $field, array $params){
@@ -50,14 +50,14 @@ class RequiredWords extends ValidationPluginBase {
       return $messages;
     }
     $text = $field->value;
-    $occurrences = 1;
-    if(isSet($params["occurrences"])){
-      $occurrences = $params["occurrences"];
-    }
-    $words = explode( ", ", $params["words"]);
-    foreach($words as $word){
-      if(preg_match_all("/\b{$word}\b/i",$text) < $occurrences){
-          array_push($messages,"Word is required: '$word'");
+    foreach($params["words"] as $word){
+      $occurrences = 1;
+      if(isSet($word["occurrences"])){
+        $occurrences = $word["occurrences"];
+      }
+      if(preg_match_all("/\b{$word["value"]}\b/i",$text) < $occurrences){
+        $value = $word["value"];
+          array_push($messages,"'$value' is required to appear $occurrences time(s)");
       }
     }
     return $messages;
