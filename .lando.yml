@@ -5,9 +5,9 @@ config:
   php: '7.3'
   via: apache
   framework: drupal8
-  # xdebug: true
-  # config:
-  #   php: .lando.php.ini
+  xdebug: true
+  config:
+    php: .lando.php.ini
 
 services:
   my-service:
@@ -16,8 +16,20 @@ services:
       - database
   database:
     type: mysql
-  # appserver:
-  #   overrides:
-  #     environment:
-  #       # Support debugging Drush with XDEBUG.
-  #       PHP_IDE_CONFIG: "serverName=appserver"
+  appserver:
+    overrides:
+      environment:
+        # Support debugging Drush with XDEBUG.
+        PHP_IDE_CONFIG: "serverName=appserver"
+
+tooling:
+  xdebug-on:
+    service: appserver
+    description: Enable xdebug for nginx.
+    cmd: docker-php-ext-enable xdebug && pkill -o -USR2 php-fpm
+    user: root
+  xdebug-off:
+    service: appserver
+    description: Disable xdebug for nginx.
+    cmd: rm /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && pkill -o -USR2 php-fpm
+    user: root
