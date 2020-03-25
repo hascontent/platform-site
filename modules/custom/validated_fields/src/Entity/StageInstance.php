@@ -132,8 +132,8 @@ class StageInstance extends ContentEntityBase implements StageInstanceInterface 
       ->setDisplayConfigurable('view', TRUE)
       ->setRequired(TRUE);
 
-    $fields['status'] = BaseFieldDefinitions::create('integer')
-      ->label(t("Status"))
+    $fields['status'] = BaseFieldDefinition::create('integer')
+      ->setLabel(t("Status"))
       ->setDescription(t('A integer indicating the state of the stage instance.'))
       ->addPropertyConstraints('value',['Range'=> ['min' => 0, 'max' => 2]]);
 
