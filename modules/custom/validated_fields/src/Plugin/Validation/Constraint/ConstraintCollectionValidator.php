@@ -110,50 +110,26 @@ class ConstraintCollectionValidator extends ConstraintValidator {
       ],
     )
   );
-//validations
-
-//length
-  // protected function length($entity, $constraint, array $params){
-  //   $length = strlen($entity->getFieldValue());
-  //   if(isSet($params['min']) && $length < $params['min']){
-  //     $min = $params['min'];
-  //     $this->context->addViolation($constraint->constraintViolation,
-  //       ['%value'=> $entity->getFieldValue(), '%constraint' => 'length', '%message' => "must be at least $min characters long, was $length"]);
-  //   }
-
-  //   if(isSet($params['max']) && $length > $params['max']){
-  //     $max = $params['max'];
-  //     $this->context->addViolation($constraint->constraintViolation,
-  //       ['%value'=> $entity->getFieldValue(), '%constraint' => 'length', '%message' => "must be at most $max characters long, was $length"]);
-  //   }
 
   /**
    * {@inheritdoc}
    */
   public function validate($entity, Constraint $constraint) {
    $type = $entity->getStorageTypeId();
+   $validations = \Drupal::service('plugin.manager.validation_plugin')->getDefinitions();
 
    if(!isSet($type)){
      $this->context->addViolation($constraint->noType);
      return;
    }
    foreach($entity->getValidations() as $validation => $params){
-     if(!isSet(self::VALIDATIONS_LIST[$validation])){
+     if(!isSet($validations[$validation])){
        $this->context->addViolation($constraint->nonexistentValidation, ['%validation' => $validation]);
        continue;
      }
-       if(!in_array($type,self::VALIDATIONS_LIST[$validation])){
+       if(!in_array($type,$validations[$validation]['allowed_fields'])){
        $this->context->addViolation($constraint->incorrectValidation, ['%validation' => $validation, '%field' => $type]);
      }
    }
-
-//   these validations are deprecated
-//   they are used to validate fields rather than the correctness
-//   of the validators the user has selected for their field
-//    foreach ($entity->getValidations() as $validation => $params) {
-//        $value = $entity->getFieldValue();
-//        $this->$validation($entity, $constraint, $params);
-//
-//    }
   }
 }

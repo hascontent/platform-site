@@ -34,3 +34,9 @@ entity.workflow_template.add_form:
   title: 'Add Workflow template'
   appears_on:
     - entity.workflow_template.collection
+
+entity.stage.add_page:
+  route_name: entity.stage.add_page
+  title: 'Add Stage'
+  appears_on:
+    - entity.stage.collection

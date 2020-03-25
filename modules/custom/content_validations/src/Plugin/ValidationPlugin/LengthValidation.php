@@ -7,7 +7,7 @@ use Drupal\Core\Field\FieldItemInterface;
 
 /**
  * Validates that the length of text meets minimum and maximum requirements
- * 
+ *
  * @ValidationPlugin(
  *   input_fields = {
  *     "min" = {
@@ -38,22 +38,22 @@ use Drupal\Core\Field\FieldItemInterface;
 class LengthValidation extends ValidationPluginBase {
     /**
      * The function that validates the field based on parameters and values passed in
-     * 
+     *
      * the field being validated
      * @param \Drupal\Core\Field\FieldItemInterface $field
-     * 
+     *
      * @param array params the array of parameters for the validations
      */
     public function validate(FieldItemInterface $field, array $params){
         $messages = [];
         $text = $field->value;
         $length = strlen($text);
-        $max = $params["max"];
-        $min = $params["min"];
-        if($text > $params["max"]){
+        if(isSet($params["max"]) && $length > $params["max"]){
+            $max = $params["max"];
             array_push($messages, "Field must be at most $max characters long");
         }
-        if($text < $params["min"]){
+        if(isSet($params["min"]) && $length < $params["min"]){
+            $min = $params["min"];
             array_push($messages, "Field must be at least $min characters long");
         }
         return $messages;

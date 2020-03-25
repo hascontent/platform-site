@@ -93,3 +93,15 @@ function validated_fields_validated_field_delete($entity){
 function validated_fields_validated_field_create($entity){
   $var = "test";
 }
+
+function validated_fields_stage_save($entity){
+  $workflow = $entity->get("content_workflow")->entity->stages;
+  $workflow_stages = $workflow->stages;
+  for($i = 0; $i<$workflow_stages; $i++){
+    if($workflow_stages->offsetGet($i)->target_id == $entity->id()){
+      return;
+    }
+  }
+  $workflow_stages->appendItem($entity);
+  $workflow->save();
+}

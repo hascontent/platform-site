@@ -22,6 +22,12 @@ use Drupal\validated_fields\Entity\ValidatedFieldInterface;
  *     "list_builder" = "Drupal\validated_fields\StageListBuilder",
  *     "views_data" = "Drupal\validated_fields\Entity\StageViewsData",
  *
+ *     "form" = {
+ *       "default" = "Drupal\validated_fields\Form\StageForm",
+ *       "add" = "Drupal\validated_fields\Form\StageForm",
+ *       "edit" = "Drupal\validated_fields\Form\StageForm",
+ *       "delete" = "Drupal\validated_fields\Form\StageDeleteForm",
+ *     },
  *     "access" = "Drupal\validated_fields\StageAccessControlHandler",
  *   },
  *   base_table = "stage",
@@ -32,6 +38,13 @@ use Drupal\validated_fields\Entity\ValidatedFieldInterface;
  *     "label" = "name",
  *     "uuid" = "uuid",
  *     "langcode" = "langcode",
+ *   },
+ *   links = {
+ *     "canonical" = "/vf/s/{stage}",
+ *     "add-form" = "/vf/s/add",
+ *     "edit-form" = "/vf/s/{stage}/edit",
+ *     "delete-form" = "/vf/s/{stage}/delete",
+ *     "collection" = "/vf/s/list",
  *   },
  * )
  */
@@ -128,7 +141,21 @@ class Stage extends ContentEntityBase implements StageInterface {
       ->setSetting('target_type','content_workflow')
       ->setSetting('handler','default')
       ->setReadOnly(TRUE)
-      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayOptions('view', [
+        'label' => 'hidden',
+        'type' => 'author',
+        'weight' => 0,
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'entity_reference_autocomplete',
+        'weight' => 5,
+        'settings' => [
+          'match_operator' => 'CONTAINS',
+          'size' => '60',
+          'autocomplete_type' => 'tags',
+          'placeholder' => '',
+        ],
+      ])      
       ->setRequired(TRUE)
       ->setCardinality(1);
 

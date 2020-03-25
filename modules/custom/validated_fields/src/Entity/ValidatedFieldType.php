@@ -64,6 +64,7 @@ class ValidatedFieldType extends ContentEntityBase implements ValidatedFieldType
     ];
   }
 
+    
   /**
    *
    * factory method for testing purposes
@@ -100,7 +101,10 @@ class ValidatedFieldType extends ContentEntityBase implements ValidatedFieldType
   }
 
   public function getValidations(){
-    return $this->validations->getValue()[0];
+    if(isSet($this->validations[0]))
+      return $this->validations->getValue()[0];
+    else
+      return [];
   }
 
 
@@ -271,8 +275,7 @@ class ValidatedFieldType extends ContentEntityBase implements ValidatedFieldType
         ),
       ))
       ->setDisplayConfigurable('form', TRUE)
-      ->setRequired(TRUE);
-
+      ->setCardinality(-1);
     return $fields;
   }
 

@@ -47,10 +47,10 @@ use Drupal\user\UserInterface;
  *   },
  *   links = {
  *     "canonical" = "/validated-fields/contentworkflow/content_workflow/{content_workflow}",
- *     "add-form" = "/validated-fields/contentworkflow/content_workflow/add",
- *     "edit-form" = "/validated-fields/contentworkflow/content_workflow/{content_workflow}/edit",
- *     "delete-form" = "/validated-fields/contentworkflow/content_workflow/{content_workflow}/delete",
- *     "collection" = "/validated-fields/contentworkflow/content_workflow",
+ *     "add-form" = "/vf/cw/add",
+ *     "edit-form" = "/vf/cw/{content_workflow}/edit",
+ *     "delete-form" = "/vf/cw/{content_workflow}/delete",
+ *     "collection" = "/vf/cw/list",
  *   },
  *   field_ui_base_route = "content_workflow.settings"
  * )
@@ -212,7 +212,21 @@ class ContentWorkflow extends ContentEntityBase implements ContentWorkflowInterf
       ->setSetting('target_type','stage')
       ->setSetting('handler','default')
       ->setReadOnly(TRUE)
-      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayOptions('view', [
+        'label' => 'hidden',
+        'type' => 'author',
+        'weight' => 0,
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'entity_reference_autocomplete',
+        'weight' => 5,
+        'settings' => [
+          'match_operator' => 'CONTAINS',
+          'size' => '60',
+          'autocomplete_type' => 'tags',
+          'placeholder' => '',
+        ],
+      ])
       ->setCardinality(-1); //infinite cardinality
     
     $fields['talent'] = BaseFieldDefinition::create('entity_reference')
