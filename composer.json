@@ -25,6 +25,7 @@
         "drupal/core-project-message": "^8.8",
         "drupal/core-recommended": "^8.8",
         "drupal/core-vendor-hardening": "^8.8",
+        "drupal/interval": "^1.5",
         "drupal/simple_oauth": "^4"
     },
     "require-dev": {},

@@ -181,3 +181,12 @@ entity.stage.canonical:
     _title: 'Stage'
   requirements:
     _entity_access: 'stage.view'
+
+#settings configuration
+validated_fields.admin_settings:
+  path: '/admin/config/validated_fields'
+  defaults:
+    _form: '\Drupal\validated_fields\Form\ModuleConfigForm'
+    _title: "Validated Fields Configuration"
+  requirements:
+    _permission: 'administer site configuration'

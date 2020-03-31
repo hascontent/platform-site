@@ -172,9 +172,12 @@ class Stage extends ContentEntityBase implements StageInterface {
       ->setSetting('handler','default')
       ->setCardinality(-1);
     
-    $fields['default_time_period'] = baseFieldDefinition::create('datetime')
-      ->setLabel(t("Default Time Period"))
-      ->setSetting('hanndler','default');
+    $fields['time_interval'] = baseFieldDefinition::create('interval')
+      ->setLabel(t("Default Time To Complete Stage"))
+      ->setSetting('hanndler','default')
+      ->setDefaultValue(["interval" => 2, "period" => "day"]);
+
+    
     return $fields;
   }
 

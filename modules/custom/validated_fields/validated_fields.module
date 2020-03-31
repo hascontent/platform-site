@@ -25,7 +25,6 @@ function validated_fields_help($route_name, RouteMatchInterface $route_match) {
 
 function validated_fields_install(){
   $defs = \Drupal::service('plugin.manager.field.field_type')->getDefinitions();
-  $base_field_types = \Drupal::EntityTypeManager()->getStorage('field_storage_config')->loadByProperties(["entity_type" => "node"]);
   $forbidden_fields = ["file_uri" => TRUE, "uuid" => TRUE, "path" => TRUE, "map" => TRUE, "created" => TRUE, "changed" => TRUE, "comment" => TRUE, "password" => TRUE, "language" => TRUE, "uuid" => TRUE, "entity_reference" => TRUE];
   foreach($defs as $field_name => $field_type){
     if($forbidden_fields[$field_name] === TRUE || strpos($field_name, "list") !== false){
@@ -84,6 +83,7 @@ function validated_fields_validated_field_insert($entity){
   
 }
 
+// deletes field_store if validated_field is deleted
 function validated_fields_validated_field_delete($entity){
   if(isSet($entity->storage->referencedEntities()[0])){
     $storage = $entity->storage->referencedEntities()[0]->delete();
@@ -94,8 +94,9 @@ function validated_fields_validated_field_create($entity){
   $var = "test";
 }
 
-function validated_fields_stage_save($entity){
-  $workflow = $entity->get("content_workflow")->entity->stages;
+// when stage is posted, adds it to list of content_workflow stages in corresponding content_workflow entity
+function validated_fields_stage_insert($entity){
+  $workflow = $entity->get("content_workflow")->entity;
   $workflow_stages = $workflow->stages;
   for($i = 0; $i<$workflow_stages; $i++){
     if($workflow_stages->offsetGet($i)->target_id == $entity->id()){
@@ -105,3 +106,33 @@ function validated_fields_stage_save($entity){
   $workflow_stages->appendItem($entity);
   $workflow->save();
 }
+
+function validated_fields_stage_instance_presave($entity){
+
+  
+  // automatically sets due dates based on start dates
+  if(!isSet($entity->start_date->value)){
+    $entity->set("start_date", $entity->estimated_start_date->value);
+  }
+  
+  if(($entity->estimated_start_date->value != $entity->original->estimated_start_date->value) && ($entity->estimated_due_date->value == $entity->original->estimated_due_date->value)){
+    $entity->setEstimatedDueFromStart();
+  }
+  if(($entity->start_date->value != $entity->original->start_date->value) && ($entity->due_date->value == $entity->original->due_date->value)){
+    $entity->setDueFromStart();
+  }
+}
+
+// attaches stage instance to stage template. The stage instance must be posted with a stage_template
+function validated_fields_stage_instance_insert($entity){
+  $stage_template = $entity->get("stage_template")->entity;
+  $stage_template_stages = $stage_template->stage_instances;
+  for($i = 0; $i<$stage_template_stages; $i++){
+    if($stage_template_stages->offsetGet($i)->target_id == $entity->id()){
+      return;
+    }
+  }
+  $stage_template_stages->appendItem($entity);
+  $stage_template->save();
+}
+

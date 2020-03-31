@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityPublishedTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\user\UserInterface;
+use Drupal\Core\Datetime\DrupalDateTime;
 
 
 /**
@@ -103,6 +104,60 @@ class StageInstance extends ContentEntityBase implements StageInstanceInterface 
     $this->set('user_id', $account->id());
     return $this;
   }
+
+  //Date Accessors
+  public function getTimeInterval(){
+    return $this->stage_template->entity->time_interval->offsetGet(0);
+  }
+
+  // Set End From Start sets the end date based on the start date and the time interval given to complete the task
+  public function setEstimatedDueFromStart(){
+    $holidays = []; // replaced by actual holidays array
+    $estimated_start_date = clone $this->estimated_start_date->date;
+    $estimated_due_date = StageInstance::addInterval($estimated_start_date, $this->getTimeInterval()->getInterval());
+    $this->set("estimated_due_date",StageInstance::DDTtoDTI($estimated_due_date));
+  }
+  public function setDueFromStart(){
+    $start_date = clone $this->start_date->date;
+    $due_date = StageInstance::addInterval($start_date, $this->getTimeInterval()->getInterval());
+    $this->set("due_date",StageInstance::DDTtoDTI($due_date));
+  }
+
+  // var: DrupalDateTime
+  public static function addInterval($start, $interval){
+    $holidays = []; //array of holidays
+    $skip_weekends = \Drupal::config('validated_fields.settings')->get('interval_skip_weekends');
+    if($skip_weekends){
+      $old_interval = $interval;
+      for($int = 1; $int <= $interval; $int++){
+        $date = clone $start;
+        $date->add(new \DateInterval("P" . $int . "D"));
+        if($date->format('w') == 0 || $date->format('w') == 6){
+          $interval++;
+          continue;
+        }
+        for($i = 0; $i < sizeof($holidays); $i++){
+          if($holidays[$i] == $date->format('w')){
+            $interval++;
+            continue;
+          }
+        }
+      }
+    }
+    $date = clone $start;
+    return $date->add(\DateInterval::createFromDateString($interval . " days"));
+  }
+
+  public function setCompleted(){
+    $this->complete_date = new DateTime();
+  }
+  // convert DrupalDateTime object to DateTimeItem readable input
+  public static function DDTtoDTI($ddt){
+    $str = $ddt->render();
+    $arr = explode(" ", $str);
+    return $arr[0] . "T" . $arr[1];
+  }
+
   /**
    * {@inheritdoc}
    */
@@ -135,7 +190,8 @@ class StageInstance extends ContentEntityBase implements StageInstanceInterface 
     $fields['status'] = BaseFieldDefinition::create('integer')
       ->setLabel(t("Status"))
       ->setDescription(t('A integer indicating the state of the stage instance.'))
-      ->addPropertyConstraints('value',['Range'=> ['min' => 0, 'max' => 2]]);
+      ->addPropertyConstraints('value',['Range'=> ['min' => 0, 'max' => 2]])
+      ->setRequired(TRUE);
 
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))
@@ -167,7 +223,8 @@ class StageInstance extends ContentEntityBase implements StageInstanceInterface 
         ],
       ])
       ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE);
+      ->setDisplayConfigurable('view', TRUE)
+      ->setRequired(TRUE);
 
     $fields['validated_fields'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Validated Fields'))
@@ -182,7 +239,36 @@ class StageInstance extends ContentEntityBase implements StageInstanceInterface 
       ->setLabel(t("Stage Template"))
       ->setDescription(t("The settings and name of the stage"))
       ->setSetting('target_type','stage')
+      ->setRequired(TRUE)
       ->setSetting('handler','default');
+
+
+    $fields["estimated_start_date"] = BaseFieldDefinition::create('datetime')
+      ->setLabel(t("Original Start Date"))
+      ->setDescription(t("The Original Start Date"))
+      ->setRequired(TRUE)
+      ->setReadOnly(TRUE);
+
+    $fields["estimated_due_date"] = BaseFieldDefinition::create('datetime')
+      ->setLabel(t("Original Due Date"))
+      ->setDescription(t("The Original Due Date"))
+      ->setReadOnly(TRUE);
+
+    $fields["start_date"] = BaseFieldDefinition::create('datetime')
+      ->setLabel(t("Estimated/Actual Start Date"))
+      ->setDescription(t("The Estimated/Actual Start Date"))
+      ->setReadOnly(TRUE);
+
+    $fields["due_date"] = BaseFieldDefinition::create('datetime')
+    ->setLabel(t("Estimated/Actual Due Date"))
+    ->setDescription(t("The Estimated/Actual Due Date"))
+    ->setReadOnly(TRUE);
+
+    $fields["complete_date"] = BaseFieldDefinition::create('datetime')
+    ->setLabel(t("Estimated/Actual Start Date"))
+    ->setDescription(t("The Estimated/Actual Start Date"))
+    ->setReadOnly(TRUE);
+
     return $fields;
   }
 
