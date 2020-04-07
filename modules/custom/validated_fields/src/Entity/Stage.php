@@ -177,7 +177,7 @@ class Stage extends ContentEntityBase implements StageInterface {
       ->setSetting('hanndler','default')
       ->setDefaultValue(["interval" => 2, "period" => "day"]);
 
-    
+
     return $fields;
   }
 

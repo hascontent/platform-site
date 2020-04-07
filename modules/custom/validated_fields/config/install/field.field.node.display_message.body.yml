@@ -1,0 +1,21 @@
+langcode: en
+status: true
+dependencies:
+    config:
+        - field.storage.node.body
+        - node.type.display_message
+    module:
+        - text
+id: node.display_message.body
+field_name: body
+entity_type: node
+bundle: display_message
+label: Body
+description: 'The body of the display message'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+    display_summary: true
+field_type: text_with_summary

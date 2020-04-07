@@ -134,10 +134,9 @@ class StageAction extends ContentEntityBase implements StageActionInterface {
       ->setLabel(t('Changed'))
       ->setDescription(t('The time that the entity was last edited.'));
 
-  $fields["next_stage"] = BaseFieldDefinition::create('entity_reference')
+  $fields["target_stage"] = BaseFieldDefinition::create('entity_reference')
     ->setSetting('target_type','stage')
-    ->setSetting('handler','default')
-    ->setCardinality(3);
+    ->setSetting('handler','default');
 
   $fields["triggered_events"] = BaseFieldDefinition::create('map')
     ->setLabel(t('Triggerred Events'))

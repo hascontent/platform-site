@@ -137,6 +137,36 @@ class ContentWorkflow extends ContentEntityBase implements ContentWorkflowInterf
     }
     return $ret;
   }
+  // Insert stage entity into middle of stage list
+  public function insertStage($stage, $offset){
+    $stages = $this->stages;
+    if(!$stages->offsetExists($offset)){
+      $stages->appendItem($stage);
+      return $this;
+    }
+    while($offset < $this->stages->count()){
+      $tmp = $stages->offsetGet($offset)->target_id;
+      $stages->offsetSet($offset, $stage);
+      $stage = $tmp;
+      $offset++;
+    }
+    $stages->appendItem($stage);
+    return $this;
+  }
+
+  //Delete All Stage Instances
+  protected function deleteStageInstances(){
+    $curr = $this->stages->offsetGet(0)->entity->stage_instances->offsetGet(0)->entity;
+    while($curr){
+      $next = $curr->next_stage;
+    }
+  } 
+  // Move Stage from one index to another
+  public function moveStage($old_offset, $new_offset){
+    $stage_id = $this->stages->offsetGet($old_offset)->target_id;
+    $this->stages->removeItem($old_offset);
+    return $this->insertStage($stage_id,$new_offset);
+  }
   /**
    * {@inheritdoc}
    */

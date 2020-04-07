@@ -1,0 +1,13 @@
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - validated_fields
+name: 'Display Message'
+type: display_message
+description: 'Content Type that can display relevant info to content creator'
+help: ''
+new_revision: false
+preview_mode: 1
+display_submitted: true

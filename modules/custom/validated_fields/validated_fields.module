@@ -98,13 +98,30 @@ function validated_fields_validated_field_create($entity){
 function validated_fields_stage_insert($entity){
   $workflow = $entity->get("content_workflow")->entity;
   $workflow_stages = $workflow->stages;
-  for($i = 0; $i<$workflow_stages; $i++){
+  for($i = 0; $i<$workflow_stages->count(); $i++){
     if($workflow_stages->offsetGet($i)->target_id == $entity->id()){
       return;
     }
   }
   $workflow_stages->appendItem($entity);
   $workflow->save();
+  
+}
+
+//when stage is deleted, move subsequent stages left by 1 in content_workflow stages array
+// TODO: delete all stage_instances associated with this stage
+function validated_fields_stage_delete($entity){
+  $stage_id = $entity->id();
+  $content_workflow = $entity->content_workflow->entity;
+  $stage_list = $content_workflow->stages;
+
+  for($i = 0; $i < $stage_list->count(); $i++){
+    if($stage_list->offsetGet($i)->target_id == $stage_id){
+      $content_workflow->stages->removeItem($i);
+      $content_workflow->save();
+    break;
+    }
+  }
 }
 
 function validated_fields_stage_instance_presave($entity){
@@ -136,3 +153,17 @@ function validated_fields_stage_instance_insert($entity){
   $stage_template->save();
 }
 
+function validated_fields_content_workflow_predelete($entity){
+  $itr = $entity->stages->getIterator();
+  while($itr->valid()){
+    $itr->current()->entity->delete();
+    $itr->next();
+  }
+}
+
+// hook to change change user
+function validated_fields_node_preSave($entity){
+  if($entity->getType() == "display_message"){
+    $entity->set("change_uid", \Drupal::currentUser()->id());
+  }
+}

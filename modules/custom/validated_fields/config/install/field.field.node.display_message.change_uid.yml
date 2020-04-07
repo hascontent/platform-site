@@ -1,0 +1,19 @@
+langcode: en
+status: true
+dependencies:
+    config:
+        - field.storage.node.change_uid
+        - node.type.display_message
+id: node.display_message.change_uid
+field_name: change_uid
+entity_type: node
+bundle: display_message
+label: Last Modified By
+description: 'The user that last modified the display message'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+    display_summary: true
+field_type: entity_reference
