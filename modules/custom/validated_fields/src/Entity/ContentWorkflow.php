@@ -158,9 +158,30 @@ class ContentWorkflow extends ContentEntityBase implements ContentWorkflowInterf
   protected function deleteStageInstances(){
     $curr = $this->stages->offsetGet(0)->entity->stage_instances->offsetGet(0)->entity;
     while($curr){
-      $next = $curr->next_stage;
+      $next = $curr->next_stage->entity;
+      $curr->delete();
+      $curr = $next;
     }
-  } 
+  }
+
+  // Rebuild all stage instances
+  public function rebuildStageInstances(){
+    if(isSet($this->stages->entity->stage_instances->entity)){
+      $this->deleteStageInstances();
+    }
+    $itr = $this->stages->getIterator();
+    $prev = null;
+    $prev_due_date = null;
+    while($itr->valid()){
+      $curr = $itr->current()->entity->createInstance(null, $prev, $prev_due_date );
+      if(!$curr->save()){
+        throw \Exception("could not save stage instance in rebuildStageInstances()");
+      }
+      $prev = $curr;
+      $prev_due_date = $curr->estimated_due_date->value;
+      $itr->next();
+    }
+  }
   // Move Stage from one index to another
   public function moveStage($old_offset, $new_offset){
     $stage_id = $this->stages->offsetGet($old_offset)->target_id;

@@ -29,10 +29,8 @@ class StageAccessControlHandler extends EntityAccessControlHandler {
     switch ($operation) {
 
       case 'view':
-        if(!$entity->isFinalized()){
-          if($entity->getOwnerId() == $account->id() || $entity->getAdminId() == $account->id()){
-            return AccessResult::allowed()->cachePerUser();
-          }
+        if(!$entity->status == 2){
+          return AccessResult::allowed()->cachePerUser();
         }
         if(in_array($account->id(),$entity->getTalentIds()) || $account->id() == $entity->getAdminId()){
           return AccessResult::allowed()->cachePerUser();
@@ -41,7 +39,7 @@ class StageAccessControlHandler extends EntityAccessControlHandler {
 
       case 'update':
       case 'delete':
-        if($entity->isFinalized()){
+        if($entity->status == 2){
           return AccessResult::neutral()->cachePerUser();
         }
         if(!isSet($entity->get('content_workflow')->target_id)){

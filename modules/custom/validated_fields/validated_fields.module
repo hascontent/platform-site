@@ -54,7 +54,12 @@ function validated_fields_install(){
     $category->save();
     $vft = \Drupal::EntityTypeManager()->getStorage("validated_field_type")->create(["field_type" => "text", "category" => "default", "name" => "default text"]);
     $vft->save();
-    
+
+    $cw = \Drupal::EntityTypeManager()->getStorage('content_workflow')->create(['name' => 'test_wf']);
+    $stage1 = \Drupal::EntityTypeManager()->getStorage('stage')->create(['name' => 'test_stage1', 'content_workflow' => $cw]);
+    $stage2 = \Drupal::EntityTypeManager()->getStorage('stage')->create(['name' => 'test_stage2', 'content_workflow' => $cw]);
+    $stage3 = \Drupal::EntityTypeManager()->getStorage('stage')->create(['name' => 'test_stage3', 'content_workflow' => $cw]);
+
 }
 
 function validated_fields_entity_type_alter( &$entity_types){
@@ -109,7 +114,6 @@ function validated_fields_stage_insert($entity){
 }
 
 //when stage is deleted, move subsequent stages left by 1 in content_workflow stages array
-// TODO: delete all stage_instances associated with this stage
 function validated_fields_stage_delete($entity){
   $stage_id = $entity->id();
   $content_workflow = $entity->content_workflow->entity;
@@ -119,40 +123,94 @@ function validated_fields_stage_delete($entity){
     if($stage_list->offsetGet($i)->target_id == $stage_id){
       $content_workflow->stages->removeItem($i);
       $content_workflow->save();
-    break;
+      break;
     }
+  }
+}
+//delete stage instances when stage is deleted
+function validated_fields_stage_predelete($entity){
+  $itr = $entity->stage_instances->getIterator();
+  while($itr->valid()){
+    $itr->current()->entity->delete();
+    $itr->next();
   }
 }
 
 function validated_fields_stage_instance_presave($entity){
-
+  //if no name given use stage-template's name
+  if(!isSet($entity->name->value)){
+    $entity->set("name",$entity->stage_template->entity->name->value);
+  }
   
   // automatically sets due dates based on start dates
-  if(!isSet($entity->start_date->value)){
+  // This logic now only triggers if the entity is being created
+  // updated stage instances will have to specify the new due date
+  if(!isSet($entity->original) && !isSet($entity->start_date->value)){
     $entity->set("start_date", $entity->estimated_start_date->value);
   }
   
-  if(($entity->estimated_start_date->value != $entity->original->estimated_start_date->value) && ($entity->estimated_due_date->value == $entity->original->estimated_due_date->value)){
+  if( !isSet($entity->original) && !isSet($entity->estimated_due_date->value) ) {
     $entity->setEstimatedDueFromStart();
   }
-  if(($entity->start_date->value != $entity->original->start_date->value) && ($entity->due_date->value == $entity->original->due_date->value)){
+  if( !isSet($entity->original) && !isSet($entity->due_date->value) ) {
     $entity->setDueFromStart();
   }
 }
 
-// attaches stage instance to stage template. The stage instance must be posted with a stage_template
 function validated_fields_stage_instance_insert($entity){
+  
+  // attaches stage instance to stage template. The stage instance must be posted with a stage_template
   $stage_template = $entity->get("stage_template")->entity;
   $stage_template_stages = $stage_template->stage_instances;
-  for($i = 0; $i<$stage_template_stages; $i++){
+  for($i = 0; $i<$stage_template_stages->count(); $i++){
     if($stage_template_stages->offsetGet($i)->target_id == $entity->id()){
       return;
     }
   }
   $stage_template_stages->appendItem($entity);
   $stage_template->save();
+
+  $prev = $entity->prev_stage->entity;
+  if($prev !== null){
+    $prev->set("next_stage",$entity);
+    $prev->save();
+  }
+  $next = $entity->next_stage->entity;
+  if($next !== null){
+    $next->set("next_stage",$entity);
+    $next->save();
+  }
 }
 
+function validated_fields_stage_instance_delete($entity){
+
+  // tie adjacent stage instances together
+  $prev = $entity->prev_stage->entity;
+  $next = $entity->next_stage->entity;
+  if($next){
+    $next->prev_stage = $prev;
+    $next->save();
+  }
+  if($prev){
+    $prev->next_stage = $next;
+    $prev->save();
+  }
+
+  $instance_id = $entity->id();
+  $stage = $entity->stage_template->entity;
+  if($stage == null){
+    return;
+  }
+  $stage_list = $stage->stage_instances;
+
+  for($i = 0; $i < $stage_list->count(); $i++){
+    if($stage_list->offsetGet($i)->target_id == $instance_id){
+      $stage->stage_instances->removeItem($i);
+      $stage->save();
+    break;
+    }
+  }
+}
 function validated_fields_content_workflow_predelete($entity){
   $itr = $entity->stages->getIterator();
   while($itr->valid()){

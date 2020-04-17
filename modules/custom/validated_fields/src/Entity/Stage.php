@@ -9,6 +9,8 @@ use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\user\UserInterface;
 use Drupal\validated_fields\Entity\ValidatedFieldInterface;
+use Drupal\Core\Datetime\DrupalDateTime;
+
 /**
  * Defines the Stage entity.
  *
@@ -98,6 +100,17 @@ class Stage extends ContentEntityBase implements StageInterface {
     return $this->get('content_workflow')->entity->getTalentIds();
   }
 
+  public function createInstance($next = null, $previous = null, $date = null, array $overrides = []){
+    $options['next_stage'] = $next;
+    $options['prev_stage'] = $previous;
+    $options['estimated_start_date'] = $date;
+    if($date == null){
+      $options['estimated_start_date'] = StageInstance::DDTtoDTI(new DrupalDateTime());
+    }
+    $options['stage_template'] = $this->id();
+    return \Drupal::EntityTypeManager()->getStorage('stage_instance')->create($options);
+
+  }
 
   /**
    * {@inheritdoc}

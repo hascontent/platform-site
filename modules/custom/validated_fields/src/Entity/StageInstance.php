@@ -9,8 +9,7 @@ use Drupal\Core\Entity\EntityPublishedTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\user\UserInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
-
-
+use Drupal\Core\Entity\EntityStorageInterface;
 /**
  * Defines the Stage Instance entity.
  *
@@ -41,6 +40,17 @@ use Drupal\Core\Datetime\DrupalDateTime;
 class StageInstance extends ContentEntityBase implements StageInstanceInterface {
 
   use EntityChangedTrait;
+
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
+    parent::preCreate($storage_controller, $values);
+    $values += [
+      'user_id' => \Drupal::currentUser()->id(),
+    ];
+  }
 
   /**
    * {@inheritdoc}
@@ -191,6 +201,7 @@ class StageInstance extends ContentEntityBase implements StageInstanceInterface 
       ->setLabel(t("Status"))
       ->setDescription(t('A integer indicating the state of the stage instance.'))
       ->addPropertyConstraints('value',['Range'=> ['min' => 0, 'max' => 2]])
+      ->setDefaultValue(0)
       ->setRequired(TRUE);
 
     $fields['created'] = BaseFieldDefinition::create('created')
@@ -269,6 +280,15 @@ class StageInstance extends ContentEntityBase implements StageInstanceInterface 
     ->setDescription(t("The Estimated/Actual Start Date"))
     ->setReadOnly(TRUE);
 
+    $fields["next_stage"] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t("Next Stage"))
+      ->setDescription(t("The Next Stage"))
+      ->setSetting('target_type','stage_instance');
+
+    $fields["prev_stage"] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t("Previous Stage"))
+      ->setDescription(t("The Previous Stage"))
+      ->setSetting('target_type','stage_instance');
     return $fields;
   }
 
