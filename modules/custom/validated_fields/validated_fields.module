@@ -105,3 +105,18 @@ function validated_fields_stage_save($entity){
   $workflow_stages->appendItem($entity);
   $workflow->save();
 }
+
+function validated_fields_taxonomy_term_delete($entity){
+  if($entity->bundle() == "field_categories"){
+    $fields = \Drupal::EntityTypeManager()->getStorage('validated_field_type')->loadMultiple();
+    foreach($fields as $field){
+      $cat = $field->category;
+      for($i = 0; $i < $cat->count(); $i++){
+        if($cat[$i]->target_id == $entity->id()){
+          $cat->removeItem($i);
+          $i--;
+        }
+      }
+    }
+  }
+}
