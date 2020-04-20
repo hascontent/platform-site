@@ -15,16 +15,16 @@ use Psr\Log\LoggerInterface;
  * Provides a resource to get view modes by entity and bundle.
  *
  * @RestResource(
- *   id = "stages",
- *   label = @Translation("Stages"),
+ *   id = "stage_transition",
+ *   label = @Translation("Stage Transition"),
  *   uri_paths = {
- *     "canonical" = "/api/stages/{id}",
+ *     "canonical" = "/api/stage/{id}",
  *     "create" = "/api/stages"
  *   },
  *   serialization_class = ""
  * )
  */
-class Stages extends ResourceBase {
+class StageTransition extends ResourceBase {
 
   /**
    * A current user instance.
