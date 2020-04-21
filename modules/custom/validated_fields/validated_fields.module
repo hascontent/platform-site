@@ -115,6 +115,7 @@ function validated_fields_taxonomy_term_delete($entity){
         if($cat[$i]->target_id == $entity->id()){
           $cat->removeItem($i);
           $i--;
+          $field->save();
         }
       }
     }
