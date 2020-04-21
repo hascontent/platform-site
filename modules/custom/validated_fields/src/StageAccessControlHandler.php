@@ -29,27 +29,14 @@ class StageAccessControlHandler extends EntityAccessControlHandler {
     switch ($operation) {
 
       case 'view':
-        if(!$entity->status == 2){
-          return AccessResult::allowed()->cachePerUser();
-        }
-        if(in_array($account->id(),$entity->getTalentIds()) || $account->id() == $entity->getAdminId()){
-          return AccessResult::allowed()->cachePerUser();
-        }
-        return AccessResult::neutral()->cachePerUser();
-
       case 'update':
       case 'delete':
-        if($entity->status == 2){
-          return AccessResult::neutral()->cachePerUser();
-        }
         if(!isSet($entity->get('content_workflow')->target_id)){
           return AccessResult::allowedIfHasPermission($account, 'administer stage entities')->cachePerUser();
         }
         if($entity->getAdminId() == $account->id()){
           return AccessResult::allowedIfHasPermission($account, 'administer stage entities')->cachePerUser();
         }
-        return AccessResult::allowedIfHasPermission($account, 'administer stage entities')->cachePerUser();
-
     }
 
     // Unknown operation, no opinion.

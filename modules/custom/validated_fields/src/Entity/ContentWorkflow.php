@@ -165,20 +165,19 @@ class ContentWorkflow extends ContentEntityBase implements ContentWorkflowInterf
   }
 
   // Rebuild all stage instances
-  public function rebuildStageInstances(){
+  public function rebuildStageInstances($start_date = null){
     if(isSet($this->stages->entity->stage_instances->entity)){
       $this->deleteStageInstances();
     }
     $itr = $this->stages->getIterator();
     $prev = null;
-    $prev_due_date = null;
     while($itr->valid()){
-      $curr = $itr->current()->entity->createInstance(null, $prev, $prev_due_date );
+      $curr = $itr->current()->entity->createInstance(null, $prev, $start_date );
       if(!$curr->save()){
         throw \Exception("could not save stage instance in rebuildStageInstances()");
       }
       $prev = $curr;
-      $prev_due_date = $curr->estimated_due_date->value;
+      $start_date = $curr->estimated_due_date->value;
       $itr->next();
     }
   }

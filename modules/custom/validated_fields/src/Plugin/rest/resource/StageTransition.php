@@ -118,7 +118,6 @@ class StageTransition extends ResourceBase {
      */
     public function put($id, array $data = []) {
 
-        // You must to implement the logic of your REST Resource here.
         // Use current user after pass authentication to validate access.
         if (!$this->currentUser->hasPermission('access content')) {
             throw new AccessDeniedHttpException();
