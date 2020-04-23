@@ -181,6 +181,18 @@ class ContentWorkflow extends ContentEntityBase implements ContentWorkflowInterf
       $itr->next();
     }
   }
+
+  // activate workflow
+  public function activateWorkflow($start_date = null){
+    //if there are no stages in the workflow error
+    if($this->stages->count() < 1){
+      $name = $this->name->value;
+      throw new \Exception("No stages in workflow: $name");
+    }
+    rebuildStageInstances($state_date);
+    $this->current_stage = 0;
+    $this->save();
+  }
   // Move Stage from one index to another
   public function moveStage($old_offset, $new_offset){
     $stage_id = $this->stages->offsetGet($old_offset)->target_id;
@@ -304,8 +316,7 @@ class ContentWorkflow extends ContentEntityBase implements ContentWorkflowInterf
       ->setDisplayConfigurable('view', TRUE)
       ->setCardinality(-1);
 
-    $fields['current_stage'] = BaseFieldDefinition::create('entity_reference')
-      ->setSetting('target_type','stage')
+    $fields['current_stage'] = BaseFieldDefinition::create('integer')
       ->setSetting('handler','default')
       ->setCardinality(1);
 

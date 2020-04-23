@@ -125,15 +125,20 @@ class StageTransition extends ResourceBase {
         $params = json_decode($this->currentRequest->getContent(), TRUE);
         if(isSet($params["execute"])){
             $stage = \Drupal::EntityTypeManager()->getStorage("stage")->load($id);
+            // check if user is owner of stage
             if($stage->getOwnerId() != $this->currentUser->id()){
                 throw new AccessDeniedHttpException();
             }
+
+            // trigger events
             try{
                 $stage->actions->offsetGet($params["execute"])->entity->triggerEvents();
             } catch(Exception $e) {
                 return new ResourceResponse(["Error" => $e->getMessage()], 400);
             }
         }
+
+        //response
         $res = ["id" => $id, "data" => $params];
         return new ModifiedResourceResponse($res, 201);
     }
@@ -151,11 +156,29 @@ class StageTransition extends ResourceBase {
      */
     public function post($data = []) {
 
-        // You must to implement the logic of your REST Resource here.
-        // Use current user after pass authentication to validate access.
-        if (!$this->currentUser->hasPermission('access content')) {
-            throw new AccessDeniedHttpException();
+        $params = json_decode($this->currentRequest->getContent(), TRUE);
+        if(isSet($params["execute"])){
+            $stage = \Drupal::EntityTypeManager()->getStorage("stage")->load($id);
+
+            // check if user is owner of stage
+            if($stage->getOwnerId() != $this->currentUser->id()){
+                throw new AccessDeniedHttpException();
+            }
+
+            // trigger events
+            try{
+                $action = $stage->actions->offsetGet($params["execute"])->entity;
+                $action->triggerEvents();
+
+                
+            } catch(Exception $e) {
+                return new ResourceResponse(["Error" => $e->getMessage()], 400);
+            }
+
         }
+
+        //response
+        $res = ["id" => $id, "data" => $params];
 
         return new ModifiedResourceResponse($data, 200);
     }

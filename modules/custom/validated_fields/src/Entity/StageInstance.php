@@ -168,6 +168,10 @@ class StageInstance extends ContentEntityBase implements StageInstanceInterface 
     return $arr[0] . "T" . $arr[1];
   }
 
+  public function getAdminId(){
+    return $this->get('stage_template')->entity->getAdminId();
+  }
+
   /**
    * {@inheritdoc}
    */
@@ -212,7 +216,7 @@ class StageInstance extends ContentEntityBase implements StageInstanceInterface 
       ->setLabel(t('Changed'))
       ->setDescription(t('The time that the entity was last edited.'));
 
-      $fields['user_id'] = BaseFieldDefinition::create('entity_reference')
+    $fields['user_id'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Authored by'))
       ->setDescription(t('The user ID of author of the Stage entity.'))
       ->setRevisionable(TRUE)
@@ -234,8 +238,7 @@ class StageInstance extends ContentEntityBase implements StageInstanceInterface 
         ],
       ])
       ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE)
-      ->setRequired(TRUE);
+      ->setDisplayConfigurable('view', TRUE);
 
     $fields['validated_fields'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Validated Fields'))

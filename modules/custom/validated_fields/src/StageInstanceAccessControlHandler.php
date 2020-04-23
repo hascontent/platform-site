@@ -19,36 +19,37 @@ class StageInstanceAccessControlHandler extends EntityAccessControlHandler {
    */
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
     /** @var \Drupal\validated_fields\Entity\StageInstanceInterface $entity */
+    if($account->id() === $entity->user_id->target_id){
 
-    switch ($operation) {
-
-      case 'view':
-
-        if (!$entity->isPublished()) {
-          return AccessResult::allowedIfHasPermission($account, 'view unpublished stage instance entities');
-        }
-
-
-        return AccessResult::allowedIfHasPermission($account, 'view published stage instance entities');
-
-      case 'update':
-
-        return AccessResult::allowedIfHasPermission($account, 'edit stage instance entities');
-
-      case 'delete':
-
-        return AccessResult::allowedIfHasPermission($account, 'delete stage instance entities');
+      if($operation == 'view')
+        return AccessResult::allowed()->cachePerUser();
     }
 
+
+    if($account->id() == $entity->getAdminId()){
+      switch ($operation) {
+
+        case 'view':
+  
+          return AccessResult::allowed()->cachePerUser();
+  
+        case 'update':  
+        case 'delete':
+          if($entity->status->value < 1)
+            return AccessResult::allowed()->cachePerUser();
+      }
+    }
+   
+
     // Unknown operation, no opinion.
-    return AccessResult::neutral();
+    return AccessResult::neutral()->cachePerUser();
   }
 
   /**
    * {@inheritdoc}
    */
   protected function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
-    return AccessResult::allowedIfHasPermission($account, 'add stage instance entities');
+    return AccessResult::neutral();
   }
 
 

@@ -30,12 +30,10 @@ class StageAccessControlHandler extends EntityAccessControlHandler {
 
       case 'view':
       case 'update':
+        return checkAdminPermission();
       case 'delete':
-        if(!isSet($entity->get('content_workflow')->target_id)){
-          return AccessResult::allowedIfHasPermission($account, 'administer stage entities')->cachePerUser();
-        }
-        if($entity->getAdminId() == $account->id()){
-          return AccessResult::allowedIfHasPermission($account, 'administer stage entities')->cachePerUser();
+        if($entity->stage_instances->count() < 1){
+          return checkAdminPermission();
         }
     }
 
@@ -50,5 +48,13 @@ class StageAccessControlHandler extends EntityAccessControlHandler {
     return AccessResult::allowedIfHasPermission($account, 'administer stage entities');
   }
 
-
+  // checks if user has admin permission and returns access result
+  private function checkAdminPermission(){
+    if(!isSet($entity->get('content_workflow')->target_id)){
+      return AccessResult::allowedIfHasPermission($account, 'administer stage entities')->cachePerUser();
+    }
+    if($entity->getAdminId() == $account->id()){
+      return AccessResult::allowedIfHasPermission($account, 'administer stage entities')->cachePerUser();
+    }
+  }
 }
