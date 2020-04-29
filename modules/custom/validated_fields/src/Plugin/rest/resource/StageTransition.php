@@ -153,27 +153,61 @@ class StageTransition extends ResourceBase {
      *
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      *   Throws exception expected.
+     * 
+     * params: {
+     * 
+     *   content_workflow id
+     *   stage_action id
+     * }
      */
     public function post($data = []) {
 
         $params = json_decode($this->currentRequest->getContent(), TRUE);
-        if(isSet($params["execute"])){
-            $stage = \Drupal::EntityTypeManager()->getStorage("stage")->load($id);
+        if(isSet($params["content_workflow_id"]) && isSet($params["stage_action_id"])){
+            $content_workflow = \Drupal::EntityTypeManager()->getStorage("content_workflow")->load($params["content_workflow_id"]);
+            $current_stage_index = $content_workflow->current_stage->value;
+            $stage = $content_workflow->stages->offsetGet($current_stage_index)->entity;
 
             // check if user is owner of stage
             if($stage->getOwnerId() != $this->currentUser->id()){
                 throw new AccessDeniedHttpException();
             }
 
-            // trigger events
             try{
-                $action = $stage->actions->offsetGet($params["execute"])->entity;
+                $action = $stage->actions->offsetGet($params["stage_action_id"])->entity;
+                $target_stage = $action->target_stage->entity;
+                $target_stage_index;
+                // trigger events
                 $action->triggerEvents();
 
+                // figure out where the target stage appears in relation to the current stage in the stage order and modify linked list
+                for($i; $i < $content_workflow->stages->count(); $i++){
+                    if($content_workflow->stages->offsetGet($i)->target_id == $target_stage->id()){
+                        $target_stage_index = $i;
+                    break;
+                    }
+                }
+
+                // if the target stage index appears right after the current stage index do a basic stage transition
+                if($target_stage_index == ($current_stage_index + 1)){
+
+                } 
                 
             } catch(Exception $e) {
                 return new ResourceResponse(["Error" => $e->getMessage()], 400);
             }
+
+            // update the status and completion date of the current and next stage
+            $current_stage_instance = $stage->stage_instances->offsetGet($stage->stage_instances->count()-1)->entity;
+            $next_stage_instance = $current_stage_instance->next_stage->entity;
+            $current_stage_instance->status->value = 2;
+            $current_stage_instance->complete_date->value = StageInstance::DDTtoDTI(new \Drupal\Core\DateTime\DrupalDateTime());
+            $current_stage_instance->save();
+            $next_stage_instance->status->value = 1;
+            $next_stage_instance->save();
+            $current_stage_instance->cascadeDueDates();
+
+
 
         }
 

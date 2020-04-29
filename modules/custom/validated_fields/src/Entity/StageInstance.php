@@ -120,6 +120,19 @@ class StageInstance extends ContentEntityBase implements StageInstanceInterface 
     return $this->stage_template->entity->time_interval->offsetGet(0);
   }
 
+  // set start and due dates of succeeding stage instances after this stage
+  public function cascadeDueDates($first = true){
+    $next_start_date = $first ? $this->complete_date->value : $this->due_date->value;
+    $next_stage = $this->next_stage->entity;
+    if($next_stage == null){
+      return;
+    } else {
+      $next_stage->start_date->value = $next_start_date;
+      $next_stage->setDueFromStart();
+      $next_stage->save();
+      $next_stage->cascadeDueDates(false); 
+    }
+  }
   // Set End From Start sets the end date based on the start date and the time interval given to complete the task
   public function setEstimatedDueFromStart(){
     $holidays = []; // replaced by actual holidays array
