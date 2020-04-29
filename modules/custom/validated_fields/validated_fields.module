@@ -121,3 +121,8 @@ function validated_fields_taxonomy_term_delete($entity){
     }
   }
 }
+
+// change modifying user to user performing modification
+function validated_fields_validated_field_type_presave($entity){
+  $entity->set('revision_uid', \Drupal::currentUser()->id());
+}
