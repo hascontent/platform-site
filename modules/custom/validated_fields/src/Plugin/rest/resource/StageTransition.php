@@ -10,6 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpFoundation\Request;
 use Psr\Log\LoggerInterface;
+use Drupal\validated_fields\Entity\StageInstance;
 
 /**
  * Provides a resource to get view modes by entity and bundle.
@@ -153,66 +154,139 @@ class StageTransition extends ResourceBase {
      *
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      *   Throws exception expected.
-     * 
+     *
      * params: {
-     * 
+     *
      *   content_workflow id
-     *   stage_action id
+     *   stage_action index
      * }
      */
     public function post($data = []) {
 
         $params = json_decode($this->currentRequest->getContent(), TRUE);
-        if(isSet($params["content_workflow_id"]) && isSet($params["stage_action_id"])){
+        if(isSet($params["content_workflow_id"]) && isSet($params["stage_action_ind"])){
             $content_workflow = \Drupal::EntityTypeManager()->getStorage("content_workflow")->load($params["content_workflow_id"]);
             $current_stage_index = $content_workflow->current_stage->value;
+            if($current_stage_index == null){
+                return new ResourceResponse("Workflow has not been activated yet", 400);
+            }
             $stage = $content_workflow->stages->offsetGet($current_stage_index)->entity;
+            $current_stage_instance = $stage->stage_instances->offsetGet($stage->stage_instances->count()-1)->entity;
 
             // check if user is owner of stage
-            if($stage->getOwnerId() != $this->currentUser->id()){
+            if($current_stage_instance->getOwnerId() != $this->currentUser->id()){
                 throw new AccessDeniedHttpException();
             }
 
             try{
-                $action = $stage->actions->offsetGet($params["stage_action_id"])->entity;
-                $target_stage = $action->target_stage->entity;
-                $target_stage_index;
+                $action = $stage->actions->offsetGet($params["stage_action_ind"])->entity;
+
+                // check if action can be used
+                if($action->uses->value == 0){
+                    return new ResourceResponse("Action has reached number of uses");
+                }
+                $action->uses->value = $action->uses->value - 1;
+                $action->save();
+                $target_stage_index = null;
                 // trigger events
                 $action->triggerEvents();
 
+                $target_stage = $action->target_stage->entity;
+
+                //in case target_stage is completion
+                if($target_stage !== null && $target_stage->id() == $content_workflow->final_stage->target_id){
+                    $current_stage_instance->status = 2;
+                    $current_stage_instance->complete_date->value = StageInstance::DDTtoDTI(new \Drupal\Core\DateTime\DrupalDateTime());
+                    $current_stage_instance->save();
+                    $content_workflow->current_stage = -2;
+                    $content_workflow->save();
+                    return new ResourceResponse([]);
+                }
                 // figure out where the target stage appears in relation to the current stage in the stage order and modify linked list
-                for($i; $i < $content_workflow->stages->count(); $i++){
-                    if($content_workflow->stages->offsetGet($i)->target_id == $target_stage->id()){
-                        $target_stage_index = $i;
-                    break;
+                if($target_stage !== null){
+                    for($i = 0; $i < $content_workflow->stages->count(); $i++){
+                        if($content_workflow->stages->offsetGet($i)->target_id == $target_stage->id()){
+                            $target_stage_index = $i;
+                        break;
+                        }
                     }
+                } else {
+                    // in the event that no target stage is given, assume it is the next stage
+                    $target_stage_index = $current_stage_index + 1;
+                }
+                //if the target stage is the same as the current stage, return without doing any stage transitions
+                if($target_stage_index == $current_stage_index){
+                    return "No stage transition performed";
+                }
+                //if the target stage appears before the current stage create copies of the stages between to lead back to the current stage
+                if($target_stage_index < $current_stage_index){
+                    $old_next_stage = $current_stage_instance->next_stage->entity;
+                    $target_stage_instance = $target_stage->createInstance(null, $current_stage_instance);
+                    $target_stage_instance->save();
+                    $current_stage_instance->next_stage = $target_stage_instance;
+                    $current_stage_instance->save();
+                    $prev_stage_instance = $target_stage_instance;
+                    $stage_instance = null;
+                    for($i = $target_stage_index + 1; $i <= $current_stage_index; $i++){
+                        $stage_instance = $content_workflow->stages[$i]->entity->createInstance(null, $prev_stage_instance);
+                        $stage_instance->save();
+                        $prev_stage_instance = $stage_instance;
+                    }
+                    $stage_instance->next_stage = $old_next_stage;
+                    $stage_instance->save();
+                    $old_next_stage->prev_stage = $stage_instance;
+                    $old_next_stage->save();
+                }
+                // stage transition for pushing passed the next stage to an upcoming stage
+                elseif($target_stage_index > $current_stage_index + 1){
+                    $stage_instance = $current_stage_instance->next_stage->entity;
+                    while($stage_instance->stage_template->target_id !== $target_stage->id()){
+                        $prev_stage_instance = $stage_instance;
+                        $stage_instance = $stage_instance->next_stage->entity;
+                        $prev_stage_instance->delete();
+                    }
+                    $stage_instance->prev_stage = $current_stage_instance;
+                    $stage_instance->save();
+                    $current_stage_instance->next_stage = $stage_instance;
+                    $current_stage_instance->save();
                 }
 
                 // if the target stage index appears right after the current stage index do a basic stage transition
                 if($target_stage_index == ($current_stage_index + 1)){
+                    //if current stage is last stage go to completion stage
+                    if($current_stage_index == $content_workflow->stages->count() - 1){
+                        $current_stage_instance->status = 2;
+                        $current_stage_instance->complete_date->value = StageInstance::DDTtoDTI(new \Drupal\Core\DateTime\DrupalDateTime());
+                        $current_stage_instance->save();
+                        $content_workflow->current_stage = -2;
+                        $content_workflow->save();
 
-                } 
-                
-            } catch(Exception $e) {
+                        return new ResourceResponse([]);
+                    }
+                }
+
+            } catch(\Exception $e) {
                 return new ResourceResponse(["Error" => $e->getMessage()], 400);
             }
 
             // update the status and completion date of the current and next stage
-            $current_stage_instance = $stage->stage_instances->offsetGet($stage->stage_instances->count()-1)->entity;
             $next_stage_instance = $current_stage_instance->next_stage->entity;
             $current_stage_instance->status->value = 2;
             $current_stage_instance->complete_date->value = StageInstance::DDTtoDTI(new \Drupal\Core\DateTime\DrupalDateTime());
             $current_stage_instance->save();
             $next_stage_instance->status->value = 1;
             $next_stage_instance->save();
-            $current_stage_instance->cascadeDueDates();
+            $content_workflow->set("current_stage", $target_stage_index);
+            $content_workflow->save();
+            //update due dates
+            $current_stage_instance->cascadeDueDates(true);
 
 
 
         }
 
         //response
-        $res = ["id" => $id, "data" => $params];
+        $res = ["id" => "id", "data" => $params];
 
         return new ModifiedResourceResponse($data, 200);
     }

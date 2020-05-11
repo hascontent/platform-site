@@ -19,7 +19,13 @@ class StageInstanceAccessControlHandler extends EntityAccessControlHandler {
    */
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
     /** @var \Drupal\validated_fields\Entity\StageInstanceInterface $entity */
-    if($account->id() === $entity->user_id->target_id){
+    $user_in_uids = false;
+    for($i = 0; $i < $entity->user_id->count(); $i++){
+      if($account->id() == $entity->user_id[$i]->target_id){
+        $user_in_uids = true;
+      }
+    }
+    if($user_in_uids){
 
       if($operation == 'view')
         return AccessResult::allowed()->cachePerUser();

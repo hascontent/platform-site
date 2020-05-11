@@ -105,3 +105,23 @@ view published stage instance entities:
 view unpublished stage instance entities:
   title: 'View unpublished Stage Instance entities'
 
+add action record entities:
+  title: 'Create new Action Record entities'
+
+administer action record entities:
+  title: 'Administer Action Record entities'
+  description: 'Allow to access the administration form to configure Action Record entities.'
+  restrict access: true
+
+delete action record entities:
+  title: 'Delete Action Record entities'
+
+edit action record entities:
+  title: 'Edit Action Record entities'
+
+view published action record entities:
+  title: 'View published Action Record entities'
+
+view unpublished action record entities:
+  title: 'View unpublished Action Record entities'
+

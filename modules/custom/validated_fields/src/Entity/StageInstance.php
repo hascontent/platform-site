@@ -45,12 +45,12 @@ class StageInstance extends ContentEntityBase implements StageInstanceInterface 
   /**
    * {@inheritdoc}
    */
-  public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
-    parent::preCreate($storage_controller, $values);
-    $values += [
-      'user_id' => \Drupal::currentUser()->id(),
-    ];
-  }
+  // public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
+  //   parent::preCreate($storage_controller, $values);
+  //   $values += [
+  //     'user_id' => \Drupal::currentUser()->id(),
+  //   ];
+  // }
 
   /**
    * {@inheritdoc}
@@ -185,6 +185,10 @@ class StageInstance extends ContentEntityBase implements StageInstanceInterface 
     return $this->get('stage_template')->entity->getAdminId();
   }
 
+  // TODO: create action to transition to next stage
+  public function createAction($params){
+    
+  }
   /**
    * {@inheritdoc}
    */
@@ -251,7 +255,8 @@ class StageInstance extends ContentEntityBase implements StageInstanceInterface 
         ],
       ])
       ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE);
+      ->setDisplayConfigurable('view', TRUE)
+      ->setCardinality(-1);
 
     $fields['validated_fields'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Validated Fields'))

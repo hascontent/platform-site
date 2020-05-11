@@ -88,7 +88,10 @@ class StageAction extends ContentEntityBase implements StageActionInterface {
    * trigger the triggered events
    */
   public function triggerEvents() {
-    $eventList = $this->triggered_events[0]->toArray();
+    $eventList = $this->triggered_events[0];
+    if($eventList == null)
+      return;
+    $eventList = $eventList->toArray();
     foreach($eventList as $val){
       $event = $val;
       $triggered_event = \Drupal::service('plugin.manager.triggered_events')->createInstance($event["id"]);
@@ -124,7 +127,8 @@ class StageAction extends ContentEntityBase implements StageActionInterface {
       ])
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE)
-      ->setRequired(TRUE);
+      ->setRequired(TRUE)
+      ->setDefaultValue("Complete");
 
   $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))
@@ -148,6 +152,10 @@ class StageAction extends ContentEntityBase implements StageActionInterface {
     ])
     ->setCardinality(1);
 
+  $fields["uses"] = BaseFieldDefinition::create('integer')
+    ->setLabel(t('Uses'))
+    ->setDescription(t('Number of times action can be used'))
+    ->setDefaultValue(-1);
     return $fields;
   }
 }

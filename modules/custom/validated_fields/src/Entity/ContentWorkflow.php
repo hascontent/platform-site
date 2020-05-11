@@ -165,7 +165,7 @@ class ContentWorkflow extends ContentEntityBase implements ContentWorkflowInterf
   }
 
   // Rebuild all stage instances
-  public function rebuildStageInstances($start_date = null){
+  protected function rebuildStageInstances($start_date = null){
     if(isSet($this->stages->entity->stage_instances->entity)){
       $this->deleteStageInstances();
     }
@@ -189,7 +189,7 @@ class ContentWorkflow extends ContentEntityBase implements ContentWorkflowInterf
       $name = $this->name->value;
       throw new \Exception("No stages in workflow: $name");
     }
-    rebuildStageInstances($state_date);
+    $this->rebuildStageInstances($start_date);
     $this->current_stage = 0;
     $this->save();
   }
@@ -198,7 +198,7 @@ class ContentWorkflow extends ContentEntityBase implements ContentWorkflowInterf
     $stage_id = $this->stages->offsetGet($old_offset)->target_id;
     $this->stages->removeItem($old_offset);
     return $this->insertStage($stage_id,$new_offset);
-  }
+  }  
   /**
    * {@inheritdoc}
    */
@@ -316,9 +316,12 @@ class ContentWorkflow extends ContentEntityBase implements ContentWorkflowInterf
       ->setDisplayConfigurable('view', TRUE)
       ->setCardinality(-1);
 
+    // special values: -1 = not activated
+    //  -2 = completed
     $fields['current_stage'] = BaseFieldDefinition::create('integer')
       ->setSetting('handler','default')
-      ->setCardinality(1);
+      ->setCardinality(1)
+      ->setDefaultValue(-1);
 
     $fields['workflow_template'] = BaseFieldDefinition::create('entity_reference')
       ->setSetting('target_type','workflow_template')
@@ -326,6 +329,10 @@ class ContentWorkflow extends ContentEntityBase implements ContentWorkflowInterf
       ->setCardinality(1)
       // ->setRequired(TRUE)
       ;
+    $fields["final_stage"] = BaseFieldDefinition::create('entity_reference')
+        ->setSetting('target_type', 'stage')
+        ->setSetting('handler','default')
+        ->setCardinality(1);
 
     return $fields;
   }

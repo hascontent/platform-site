@@ -54,6 +54,7 @@ class Stage extends ContentEntityBase implements StageInterface {
 
   use EntityChangedTrait;
 
+  const __COMPLETE__ = "__COMPLETE__";
   /**
    * {@inheritdoc}
    */
@@ -84,7 +85,9 @@ class Stage extends ContentEntityBase implements StageInterface {
     return $this;
   }
 
-
+  public function getOwnerId(){
+    return $this->get('user_id')->target_id;
+  }
 
   public function getAdminId(){
     return $this->get('content_workflow')->entity->getOwnerId();
@@ -112,6 +115,16 @@ class Stage extends ContentEntityBase implements StageInterface {
 
   }
 
+  public function createAction($target_stage_index = null, $name = "next", $triggered_events = [], $options = []){
+
+    $options["target_stage"] = $this->content_workflow->entity->stages[$target_stage_index]->target_id;
+    $options["name"] = $name;
+    $options["triggered_events"] = $triggered_events;
+    $action = \Drupal::EntityTypeManager()->getStorage("stage_action")->create($options);
+    $action->save();
+    $this->actions->appendItem($action);
+    return $action;
+  }
   /**
    * {@inheritdoc}
    */
@@ -141,8 +154,8 @@ class Stage extends ContentEntityBase implements StageInterface {
       ])
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE)
-      ->setRequired(TRUE);
-
+      ->setCardinality(-1);
+      
     $fields['name'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Name'))
       ->setDescription(t('The name of the Stage entity.'))
