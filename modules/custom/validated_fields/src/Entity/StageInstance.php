@@ -310,6 +310,11 @@ class StageInstance extends ContentEntityBase implements StageInstanceInterface 
       ->setLabel(t("Previous Stage"))
       ->setDescription(t("The Previous Stage"))
       ->setSetting('target_type','stage_instance');
+
+    $fields["action_record"] = baseFieldDefinition::create('entity_reference')
+      ->setLabel(t("Action Record"))
+      ->setDescription(t("Record of the action taken at the end of this stage"))
+      ->setSetting('target_type','action_record');
     return $fields;
   }
 

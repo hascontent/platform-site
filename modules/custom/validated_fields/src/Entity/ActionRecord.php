@@ -30,11 +30,9 @@ use Drupal\user\UserInterface;
  *   admin_permission = "administer action record entities",
  *   entity_keys = {
  *     "id" = "id",
- *     "label" = "name",
  *     "uuid" = "uuid",
  *     "uid" = "user_id",
  *     "langcode" = "langcode",
- *     "published" = "status",
  *   },
  * )
  */
@@ -43,30 +41,15 @@ class ActionRecord extends ContentEntityBase implements ActionRecordInterface {
   use EntityChangedTrait;
   use EntityPublishedTrait;
 
-  /**
-   * {@inheritdoc}
-   */
-  public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
-    parent::preCreate($storage_controller, $values);
-    $values += [
-      'user_id' => \Drupal::currentUser()->id(),
-    ];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getName() {
-    return $this->get('name')->value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setName($name) {
-    $this->set('name', $name);
-    return $this;
-  }
+  // /**
+  //  * {@inheritdoc}
+  //  */
+  // public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
+  //   parent::preCreate($storage_controller, $values);
+  //   $values += [
+  //     'user_id' => \Drupal::currentUser()->id(),
+  //   ];
+  // }
 
   /**
    * {@inheritdoc}
@@ -83,19 +66,19 @@ class ActionRecord extends ContentEntityBase implements ActionRecordInterface {
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getOwner() {
-    return $this->get('user_id')->entity;
-  }
+  // /**
+  //  * {@inheritdoc}
+  //  */
+  // public function getOwner() {
+  //   return $this->get('user_id')->entity;
+  // }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getOwnerId() {
-    return $this->get('user_id')->target_id;
-  }
+  // /**
+  //  * {@inheritdoc}
+  //  */
+  // public function getOwnerId() {
+  //   return $this->get('user_id')->target_id;
+  // }
 
   /**
    * {@inheritdoc}
@@ -118,9 +101,6 @@ class ActionRecord extends ContentEntityBase implements ActionRecordInterface {
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = parent::baseFieldDefinitions($entity_type);
-
-    // Add the published field.
-    $fields += static::publishedBaseFieldDefinitions($entity_type);
 
     $fields['user_id'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Authored by'))
@@ -145,33 +125,6 @@ class ActionRecord extends ContentEntityBase implements ActionRecordInterface {
       ])
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
-
-    $fields['name'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Name'))
-      ->setDescription(t('The name of the Action Record entity.'))
-      ->setSettings([
-        'max_length' => 50,
-        'text_processing' => 0,
-      ])
-      ->setDefaultValue('')
-      ->setDisplayOptions('view', [
-        'label' => 'above',
-        'type' => 'string',
-        'weight' => -4,
-      ])
-      ->setDisplayOptions('form', [
-        'type' => 'string_textfield',
-        'weight' => -4,
-      ])
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE)
-      ->setRequired(TRUE);
-
-    $fields['status']->setDescription(t('A boolean indicating whether the Action Record is published.'))
-      ->setDisplayOptions('form', [
-        'type' => 'boolean_checkbox',
-        'weight' => -3,
-      ]);
 
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))

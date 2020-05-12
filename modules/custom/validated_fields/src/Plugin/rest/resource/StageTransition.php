@@ -182,7 +182,7 @@ class StageTransition extends ResourceBase {
                 $action = $stage->actions->offsetGet($params["stage_action_ind"])->entity;
 
                 // check if action can be used
-                if($action->uses->value == 0){
+                if($action->uses->value <= $action->records->count()){
                     return new ResourceResponse("Action has reached number of uses");
                 }
                 $action->uses->value = $action->uses->value - 1;
@@ -270,7 +270,9 @@ class StageTransition extends ResourceBase {
             }
 
             // update the status and completion date of the current and next stage
+            $record = $action->createRecord($this->currentUser->id());
             $next_stage_instance = $current_stage_instance->next_stage->entity;
+            $current_stage_instance->action_record = $record;
             $current_stage_instance->status->value = 2;
             $current_stage_instance->complete_date->value = StageInstance::DDTtoDTI(new \Drupal\Core\DateTime\DrupalDateTime());
             $current_stage_instance->save();
@@ -280,8 +282,6 @@ class StageTransition extends ResourceBase {
             $content_workflow->save();
             //update due dates
             $current_stage_instance->cascadeDueDates(true);
-
-
 
         }
 

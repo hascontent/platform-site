@@ -7,6 +7,7 @@ use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
 
+define("DB_MAX_INT",2147483647 );
 /**
  * Defines the Stage action entity.
  *
@@ -100,6 +101,18 @@ class StageAction extends ContentEntityBase implements StageActionInterface {
   }
 
   /**
+   *  create a new record
+   */
+  public function createRecord($user, $options = []){
+    $options["user_id"] = $user;
+    $record = \Drupal::EntityTypeManager()->getStorage('action_record')->create($options);
+    $record->save();
+    $this->records->appendItem($record);
+    $this->save();
+    return $record;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
@@ -155,7 +168,14 @@ class StageAction extends ContentEntityBase implements StageActionInterface {
   $fields["uses"] = BaseFieldDefinition::create('integer')
     ->setLabel(t('Uses'))
     ->setDescription(t('Number of times action can be used'))
-    ->setDefaultValue(-1);
+    ->setDefaultValue(DB_MAX_INT);
+
+  $fields["records"] = baseFieldDefinition::create('entity_reference')
+    ->setLabel(t("Action Record"))
+    ->setDescription(t('Record of times this action was taken'))
+    ->setSetting('target_type','action_record')
+    ->setSetting('handler','default')
+    ->setCardinality(-1);
     return $fields;
   }
 }

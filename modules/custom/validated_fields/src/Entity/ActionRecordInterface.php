@@ -12,30 +12,11 @@ use Drupal\user\EntityOwnerInterface;
  *
  * @ingroup validated_fields
  */
-interface ActionRecordInterface extends ContentEntityInterface, EntityChangedInterface, EntityPublishedInterface, EntityOwnerInterface {
+interface ActionRecordInterface extends ContentEntityInterface, EntityChangedInterface {
 
   /**
    * Add get/set methods for your configuration properties here.
    */
-
-  /**
-   * Gets the Action Record name.
-   *
-   * @return string
-   *   Name of the Action Record.
-   */
-  public function getName();
-
-  /**
-   * Sets the Action Record name.
-   *
-   * @param string $name
-   *   The Action Record name.
-   *
-   * @return \Drupal\validated_fields\Entity\ActionRecordInterface
-   *   The called Action Record entity.
-   */
-  public function setName($name);
 
   /**
    * Gets the Action Record creation timestamp.
