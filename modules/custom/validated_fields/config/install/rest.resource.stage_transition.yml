@@ -1,0 +1,10 @@
+id: stage_transition
+plugin_id: stage_transition
+granularity: method
+configuration:
+  POST:
+    supported_formats:
+      - json
+    supported_auth:
+      - cookie
+      - oauth2
