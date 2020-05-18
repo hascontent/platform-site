@@ -227,6 +227,10 @@ class Stage extends ContentEntityBase implements StageInterface {
       ->setSetting('hanndler','default')
       ->setDefaultValue(["interval" => 2, "period" => "day"]);
 
+    $fields['auto_advance'] = baseFieldDefinition::create('boolean')
+      ->setLabel("Auto Advance")
+      ->setDescription("Decide whether to auto advance the stage once it hits its due date")
+      ->setDefaultValue(FALSE);
 
     return $fields;
   }

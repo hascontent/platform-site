@@ -284,3 +284,18 @@ function validated_fields_taxonomy_term_delete($entity){
     }
   }
 }
+
+// crohn jobs
+function validated_fields_cron(){
+  $date = Entity\StageInstance::DDTtoDTI(new \Drupal\Core\Datetime\DrupalDateTime());
+  $stageids = \Drupal::entityQuery('stage_instance')->condition('status',1,'=')->condition('due_date',$date,'<')->execute();
+  $stages = Entity\StageInstance::loadMultiple($stageids);
+  foreach($stages as $stage){
+    if($stage->stage_template->entity->auto_advance->value){
+      //get content workflow
+      // update the status and completion date of the current and next stage
+      $content_workflow = $stage->stage_template->entity->content_workflow->entity;
+      $content_workflow->transitionStage(0);
+    }
+  }
+}
