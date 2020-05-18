@@ -1,0 +1,4 @@
+services:
+  plugin.manager.triggered_events:
+    class: Drupal\triggered_events\Plugin\TriggeredEventsManager
+    parent: default_plugin_manager

@@ -45,6 +45,7 @@ class FieldStoreTypeAccessControlHandler extends EntityAccessControlHandler {
     // if ($account->hasPermission($admin_permission)) {
     //   return AccessResult::allowed();
     // }
+    return AccessResult::allowedIfHasPermission($account, $admin_permission);
     return AccessResult::neutral();
   }
 

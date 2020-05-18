@@ -20,37 +20,30 @@ class StageAccessControlHandler extends EntityAccessControlHandler {
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
     /** @var \Drupal\validated_fields\Entity\StageInterface $entity */
     if($account->hasPermission('administer site configuration')){
-      return AccessResult::allowed();
+      return AccessResult::allowed()->cachePerUser();
     }
 
-    if(!($account->id() == $entity->getAdminId()) && !in_array($account->id(),$entity->content_workflow->entity->getTalentIds())){
-      return AccessResult::neutral();
-    }
     switch ($operation) {
 
       case 'view':
-        if(!$entity->isFinalized()){
-          if($entity->getOwnerId() == $account->id() || $entity->getAdminId() == $account->id()){
-            return AccessResult::allowed();
+        $user_in_uids = false;
+        for($i = 0; $i < $entity->user_id->count(); $i++){
+          if($account->id() == $entity->user_id[$i]->target_id){
+            $user_in_uids = true;
           }
         }
+        if($user_in_uids)
+          return AccessResult::allowed()->cachePerUser();
       case 'update':
+        return StageAccessControlHandler::checkAdminPermission($entity, $account);
       case 'delete':
-        if($entity->isFinalized()){
-          return AccessResult::neutral();
+        if($entity->stage_instances->count() < 1){
+          return StageAccessControlHandler::checkAdminPermission($entity, $account);
         }
-        if(!isSet($entity->get('content_workflow')->target_id)){
-          return AccessResult::allowedIfHasPermission($account, 'administer stage entities');
-        }
-        if($entity->getAdminId() == $account->id()){
-          return AccessResult::allowedIfHasPermission($account, 'administer stage entities');
-        }
-        return AccessResult::allowedIfHasPermission($account, 'administer stage entities');
-
     }
 
     // Unknown operation, no opinion.
-    return AccessResult::neutral();
+    return AccessResult::neutral()->cachePerUser();
   }
 
   /**
@@ -60,5 +53,14 @@ class StageAccessControlHandler extends EntityAccessControlHandler {
     return AccessResult::allowedIfHasPermission($account, 'administer stage entities');
   }
 
-
+  // checks if user has admin permission and returns access result
+  private static function checkAdminPermission($entity, $account){
+    if(!isSet($entity->get('content_workflow')->target_id)){
+      return AccessResult::allowedIfHasPermission($account, 'administer stage entities')->cachePerUser();
+    }
+    if($entity->getAdminId() == $account->id()){
+      return AccessResult::allowedIfHasPermission($account, 'administer stage entities')->cachePerUser();
+    }
+    return AccessResult::neutral()->cachePerUser();
+  }
 }

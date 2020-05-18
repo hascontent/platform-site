@@ -1,0 +1,22 @@
+{#
+/**
+ * @file workflow_template.html.twig
+ * Default theme implementation to present Workflow template data.
+ *
+ * This template is used when viewing Workflow template pages.
+ *
+ *
+ * Available variables:
+ * - content: A list of content items. Use 'content' to print all content, or
+ * - attributes: HTML attributes for the container element.
+ *
+ * @see template_preprocess_workflow_template()
+ *
+ * @ingroup themeable
+ */
+#}
+<div{{ attributes.addClass('workflow_template') }}>
+  {% if content %}
+    {{- content -}}
+  {% endif %}
+</div>

@@ -1,0 +1,28 @@
+langcode: en
+status: true
+dependencies:
+    config:
+        - field.field.node.display_message.body
+        - node.type.display_message
+    module:
+        - text
+        - user
+id: node.display_message.default
+targetEntityType: node
+bundle: display_message
+mode: default
+content:
+    body:
+        label: hidden
+        type: text_default
+        weight: 101
+        settings: {  }
+        third_party_settings: {  }
+    change_uid:
+        label: hidden
+        type: entity_reference_label
+        settings: { }
+        third_party_settings: { }
+    links:
+        weight: 100
+hidden: {  }

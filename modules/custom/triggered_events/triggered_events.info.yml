@@ -1,0 +1,5 @@
+name: 'Triggered Events'
+type: module
+description: 'events that can be attached via a plugin system to code'
+core: 8.x
+package: 'Custom'

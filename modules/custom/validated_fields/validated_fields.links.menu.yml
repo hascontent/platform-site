@@ -50,3 +50,31 @@ content_workflow.admin.structure.settings:
   description: 'Configure Content Workflow entities'
   route_name: content_workflow.settings
   parent: system.admin_structure
+
+# Stage action menu items definition
+entity.stage_action.collection:
+  title: 'Stage action list'
+  route_name: entity.stage_action.collection
+  description: 'List Stage action entities'
+  parent: system.admin_structure
+  weight: 100
+
+stage_action.admin.structure.settings:
+  title: 'Stage action settings'
+  description: 'Configure Stage action entities'
+  route_name: stage_action.settings
+  parent: system.admin_structure
+
+# Workflow template menu items definition
+entity.workflow_template.collection:
+  title: 'Workflow template list'
+  route_name: entity.workflow_template.collection
+  description: 'List Workflow template entities'
+  parent: system.admin_structure
+  weight: 100
+
+workflow_template.admin.structure.settings:
+  title: 'Workflow template settings'
+  description: 'Configure Workflow template entities'
+  route_name: workflow_template.settings
+  parent: system.admin_structure

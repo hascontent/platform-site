@@ -21,30 +21,30 @@ class ContentWorkflowAccessControlHandler extends EntityAccessControlHandler {
     /** @var \Drupal\validated_fields\Entity\ContentWorkflowInterface $entity */
 
     if($account->hasPermission('administer site configuration')){
-      return AccessResult::allowed();
+      return AccessResult::allowed()->cachePerUser();
     }
     if($account->id() == $entity->getOwnerId()){
-      return AccessResult::allowed();
+      return AccessResult::allowed()->cachePerUser();
     }
     switch ($operation) {
 
       case 'view':
 
         if (in_array($account->id(), $entity->getTalentIds())) {
-            return AccessResult::allowed();
+            return AccessResult::allowed()->cachePerUser();
         }
-        return AccessResult::neutral();
+        return AccessResult::neutral()->cachePerUser();
 
       case 'edit':
       case 'update':
       case 'delete':
 
-        return AccessResult::neutral();
+        return AccessResult::neutral()->cachePerUser();
         
     }
 
     // Unknown operation, no opinion.
-    return AccessResult::neutral();
+    return AccessResult::neutral()->cachePerUser();
   }
 
   /**

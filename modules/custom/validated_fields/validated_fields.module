@@ -25,7 +25,6 @@ function validated_fields_help($route_name, RouteMatchInterface $route_match) {
 
 function validated_fields_install(){
   $defs = \Drupal::service('plugin.manager.field.field_type')->getDefinitions();
-  $base_field_types = \Drupal::EntityTypeManager()->getStorage('field_storage_config')->loadByProperties(["entity_type" => "node"]);
   $forbidden_fields = ["file_uri" => TRUE, "uuid" => TRUE, "path" => TRUE, "map" => TRUE, "created" => TRUE, "changed" => TRUE, "comment" => TRUE, "password" => TRUE, "language" => TRUE, "uuid" => TRUE, "entity_reference" => TRUE];
   foreach($defs as $field_name => $field_type){
     if($forbidden_fields[$field_name] === TRUE || strpos($field_name, "list") !== false){
@@ -55,7 +54,16 @@ function validated_fields_install(){
     $category->save();
     $vft = \Drupal::EntityTypeManager()->getStorage("validated_field_type")->create(["field_type" => "text", "category" => "default", "name" => "default text"]);
     $vft->save();
-    
+
+    $cw = \Drupal::EntityTypeManager()->getStorage('content_workflow')->create(['name' => 'test_wf', 'user_id' => 1]);
+    $cw->save();
+    $stage1 = \Drupal::EntityTypeManager()->getStorage('stage')->create(['name' => 'test_stage1', 'content_workflow' => $cw]);
+    $stage2 = \Drupal::EntityTypeManager()->getStorage('stage')->create(['name' => 'test_stage2', 'content_workflow' => $cw]);
+    $stage3 = \Drupal::EntityTypeManager()->getStorage('stage')->create(['name' => 'test_stage3', 'content_workflow' => $cw]);
+    $stage1->save();
+    $stage2->save();
+    $stage3->save();
+
 }
 
 function validated_fields_entity_type_alter( &$entity_types){
@@ -84,6 +92,7 @@ function validated_fields_validated_field_insert($entity){
   
 }
 
+// deletes field_store if validated_field is deleted
 function validated_fields_validated_field_delete($entity){
   if(isSet($entity->storage->referencedEntities()[0])){
     $storage = $entity->storage->referencedEntities()[0]->delete();
@@ -94,18 +103,172 @@ function validated_fields_validated_field_create($entity){
   $var = "test";
 }
 
-function validated_fields_stage_save($entity){
-  $workflow = $entity->get("content_workflow")->entity->stages;
+//when stage is first created add default action to move to next stage
+function validated_fields_stage_presave($entity){
+  if(!isSet($entity->original)){
+    $action = \Drupal::EntityTypeManager()->getStorage("stage_action")->create([]);
+    $action->save();
+    $entity->actions->appendItem($action);
+
+    if(!isSet($entity->user_id->target_id)){
+      $entity->set('user_id', $entity->getAdminId());
+    }
+  }
+}
+// when stage is posted, adds it to list of content_workflow stages in corresponding content_workflow entity
+function validated_fields_stage_insert($entity){
+  $workflow = $entity->get("content_workflow")->entity;
   $workflow_stages = $workflow->stages;
-  for($i = 0; $i<$workflow_stages; $i++){
+  for($i = 0; $i<$workflow_stages->count(); $i++){
     if($workflow_stages->offsetGet($i)->target_id == $entity->id()){
       return;
     }
   }
   $workflow_stages->appendItem($entity);
   $workflow->save();
+  
 }
 
+//when stage is deleted, move subsequent stages left by 1 in content_workflow stages array
+function validated_fields_stage_delete($entity){
+  $stage_id = $entity->id();
+  $content_workflow = $entity->content_workflow->entity;
+
+  if($stage->name->value == Entity\Stage::__COMPLETE__){
+    
+  }
+  $stage_list = $content_workflow->stages;
+
+  for($i = 0; $i < $stage_list->count(); $i++){
+    if($stage_list->offsetGet($i)->target_id == $stage_id){
+      $content_workflow->stages->removeItem($i);
+      $content_workflow->save();
+      break;
+    }
+  }
+}
+//delete stage instances when stage is deleted
+function validated_fields_stage_predelete($entity){
+  $itr = $entity->stage_instances->getIterator();
+  while($itr->valid()){
+    $itr->current()->entity->delete();
+    $itr->next();
+  }
+
+  // delete stage actions
+  $itr = $entity->actions->getIterator();
+  while($itr->valid()){
+    $itr->current()->entity->delete();
+    $itr->next();
+  }
+}
+
+function validated_fields_stage_instance_presave($entity){
+  //if no name given use stage-template's name
+  if(!isSet($entity->name->value)){
+    $entity->set("name",$entity->stage_template->entity->name->value);
+  }
+  if(!isSet($entity->user_id->target_id)){
+    $entity->set("user_id", $entity->stage_template->entity->user_id->target_id);
+  }
+  // automatically sets due dates based on start dates
+  // This logic now only triggers if the entity is being created
+  // updated stage instances will have to specify the new due date
+  if(!isSet($entity->original) && !isSet($entity->start_date->value)){
+    $entity->set("start_date", $entity->estimated_start_date->value);
+  }
+  
+  if( !isSet($entity->original) && !isSet($entity->estimated_due_date->value) ) {
+    $entity->setEstimatedDueFromStart();
+  }
+  if( !isSet($entity->original) && !isSet($entity->due_date->value) ) {
+    $entity->setDueFromStart();
+  }
+}
+
+function validated_fields_stage_instance_insert($entity){
+  
+  // if stage is auto-generated final stage do not perform below operation
+  if($entity->name->value == Entity\Stage::__COMPLETE__){
+    return;
+  }
+
+  // attaches stage instance to stage template. The stage instance must be posted with a stage_template
+  $stage_template = $entity->get("stage_template")->entity;
+  $stage_template_stages = $stage_template->stage_instances;
+  for($i = 0; $i<$stage_template_stages->count(); $i++){
+    if($stage_template_stages->offsetGet($i)->target_id == $entity->id()){
+      return;
+    }
+  }
+  $stage_template_stages->appendItem($entity);
+  $stage_template->save();
+
+  $prev = $entity->prev_stage->entity;
+  if($prev !== null){
+    $prev->set("next_stage",$entity);
+    $prev->save();
+  }
+  $next = $entity->next_stage->entity;
+  if($next !== null){
+    $next->set("next_stage",$entity);
+    $next->save();
+  }
+
+}
+
+function validated_fields_stage_instance_delete($entity){
+
+  // tie adjacent stage instances together
+  $prev = $entity->prev_stage->entity;
+  $next = $entity->next_stage->entity;
+  if($next){
+    $next->prev_stage = $prev;
+    $next->save();
+  }
+  if($prev){
+    $prev->next_stage = $next;
+    $prev->save();
+  }
+
+  $instance_id = $entity->id();
+  $stage = $entity->stage_template->entity;
+  if($stage == null){
+    return;
+  }
+  $stage_list = $stage->stage_instances;
+
+  for($i = 0; $i < $stage_list->count(); $i++){
+    if($stage_list->offsetGet($i)->target_id == $instance_id){
+      $stage->stage_instances->removeItem($i);
+      $stage->save();
+    break;
+    }
+  }
+}
+function validated_fields_content_workflow_insert($entity){
+  $stage = \Drupal::EntityTypeManager()->getStorage("stage")->create(["name" => Entity\Stage::__COMPLETE__, "content_workflow" => $entity->id()]);
+  $stage->save();
+  $entity->final_stage = $stage;
+  $entity->save();
+}
+function validated_fields_content_workflow_predelete($entity){
+  $itr = $entity->stages->getIterator();
+  while($itr->valid()){
+    $itr->current()->entity->delete();
+    $itr->next();
+  }
+  if($entity->final_stage->entity !== null){
+    $entity->final_stage->entity->delete();
+  }
+}
+
+// hook to change change user
+function validated_fields_node_preSave($entity){
+  if($entity->getType() == "display_message"){
+    $entity->set("change_uid", \Drupal::currentUser()->id());
+  }
+}
 function validated_fields_taxonomy_term_delete($entity){
   if($entity->bundle() == "field_categories"){
     $fields = \Drupal::EntityTypeManager()->getStorage('validated_field_type')->loadMultiple();
@@ -125,4 +288,19 @@ function validated_fields_taxonomy_term_delete($entity){
 // change modifying user to user performing modification
 function validated_fields_validated_field_type_presave($entity){
   $entity->set('revision_uid', \Drupal::currentUser()->id());
+}
+
+// crohn jobs
+function validated_fields_cron(){
+  $date = Entity\StageInstance::DDTtoDTI(new \Drupal\Core\Datetime\DrupalDateTime());
+  $stageids = \Drupal::entityQuery('stage_instance')->condition('status',1,'=')->condition('due_date',$date,'<')->execute();
+  $stages = Entity\StageInstance::loadMultiple($stageids);
+  foreach($stages as $stage){
+    if($stage->stage_template->entity->auto_advance->value){
+      //get content workflow
+      // update the status and completion date of the current and next stage
+      $content_workflow = $stage->stage_template->entity->content_workflow->entity;
+      $content_workflow->transitionStage(0);
+    }
+  }
 }

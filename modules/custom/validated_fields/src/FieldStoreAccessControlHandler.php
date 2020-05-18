@@ -23,38 +23,35 @@ class FieldStoreAccessControlHandler extends EntityAccessControlHandler {
     // annotation.
     $admin_permission = $this->entityType->getAdminPermission();
     if ($account->hasPermission($admin_permission)) {
-      return AccessResult::allowed();
+      return AccessResult::allowed()->cachePerUser();
     }
     switch ($operation) {
       case 'view':
         if($account->id() == $entity->getOwnerId() && $entity->getParent()->getPermissionLevel() > 0){
-          return AccessResult::allowedIfHasPermission($account, 'view unpublished validated field entities');
+          return AccessResult::allowedIfHasPermission($account, 'view unpublished validated field entities')->cachePerUser();
         }
         if($account->id() == $entity->getAdminId()){
-          return AccessResult::allowedIfHasPermission($account, "administer validated field entities");
+          return AccessResult::allowedIfHasPermission($account, "administer validated field entities")->cachePerUser();
         }
-        if ($entity->isFinalized() &&in_array($account->id(),$entity->validated_field->entity->stage->entity->content_workflow->getTalentIds())) {
-          return AccessResult::allowedIfHasPermission($account, 'view published validated field entities');
+        if ($entity->isFinalized() &&in_array($account->id(),$entity->validated_field->entity->stage->entity->content_workflow->entity->getTalentIds())) {
+          return AccessResult::allowedIfHasPermission($account, 'view published validated field entities')->cachePerUser();
         }
-        return AccessResult::neutral();
+        return AccessResult::neutral()->cachePerUser();
       case 'update':
         if($entity->isFinalized()){
-          return AccessResult::neutral();
+          return AccessResult::neutral()->cachePerUser();
         }
         if($account->id() == $entity->getOwnerId() && $entity->getParent()->getPermissionLevel() > 1){
-          return AccessResult::allowedIfHasPermission($account, 'view unpublished validated field entities');
+          return AccessResult::allowedIfHasPermission($account, 'view unpublished validated field entities')->cachePerUser();
         }
         if($account->id() == $entity->getAdminId()){
-          return AccessResult::allowedIfHasPermission($account, 'administer validated field entities');
+          return AccessResult::allowedIfHasPermission($account, 'administer validated field entities')->cachePerUser();
         }
-        return AccessResult::neutral();
+        return AccessResult::neutral()->cachePerUser();
       case 'delete':
-        if($entity->isFinalized()){
-          return AccessResult::neutral();
-        }
-        return AccessResult::allowedIfHasPermission($account, 'administer validated field entities');
+        return AccessResult::allowedIfHasPermission($account, $admin_permission)->cachePerUser();
     }
-    return AccessResult::neutral();
+    return AccessResult::neutral()->cachePerUser();
   }
 
   /**
@@ -68,7 +65,7 @@ class FieldStoreAccessControlHandler extends EntityAccessControlHandler {
     // annotation.
     $admin_permission = $this->entityType->getAdminPermission();
     if ($account->hasPermission($admin_permission)) {
-      return AccessResult::allowed();
+      return AccessResult::allowed()->cachePerUser();
     }
     return AccessResult::allowedIfHasPermission($account, 'administer validated field entities');
   }

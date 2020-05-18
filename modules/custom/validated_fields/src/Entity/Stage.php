@@ -6,10 +6,11 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
-use Drupal\Core\Entity\EntityPublishedTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\user\UserInterface;
 use Drupal\validated_fields\Entity\ValidatedFieldInterface;
+use Drupal\Core\Datetime\DrupalDateTime;
+
 /**
  * Defines the Stage entity.
  *
@@ -38,9 +39,7 @@ use Drupal\validated_fields\Entity\ValidatedFieldInterface;
  *     "id" = "id",
  *     "label" = "name",
  *     "uuid" = "uuid",
- *     "uid" = "user_id",
  *     "langcode" = "langcode",
- *     "published" = "status",
  *   },
  *   links = {
  *     "canonical" = "/vf/s/{stage}",
@@ -54,18 +53,8 @@ use Drupal\validated_fields\Entity\ValidatedFieldInterface;
 class Stage extends ContentEntityBase implements StageInterface {
 
   use EntityChangedTrait;
-  use EntityPublishedTrait;
 
-  /**
-   * {@inheritdoc}
-   */
-  public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
-    parent::preCreate($storage_controller, $values);
-    $values += [
-      'user_id' => \Drupal::currentUser()->id(),
-    ];
-  }
-
+  const __COMPLETE__ = "__COMPLETE__";
   /**
    * {@inheritdoc}
    */
@@ -96,26 +85,8 @@ class Stage extends ContentEntityBase implements StageInterface {
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getOwner() {
-    return $this->get('user_id')->entity;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getOwnerId() {
+  public function getOwnerId(){
     return $this->get('user_id')->target_id;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setOwnerId($uid) {
-    $this->set('user_id', $uid);
-    return $this;
   }
 
   public function getAdminId(){
@@ -126,25 +97,39 @@ class Stage extends ContentEntityBase implements StageInterface {
     return $this->get('content_workflow')->entity->getOwner();
   }
 
-  public function isFinalized(){
-    return $this->isPublished();
-  }
-  /**
-   * {@inheritdoc}
-   */
-  public function setOwner(UserInterface $account) {
-    $this->set('user_id', $account->id());
-    return $this;
+
+
+  public function getTalentIds(){
+    return $this->get('content_workflow')->entity->getTalentIds();
   }
 
+  public function createInstance($next = null, $previous = null, $date = null, array $overrides = []){
+    $options['next_stage'] = $next;
+    $options['prev_stage'] = $previous;
+    $options['estimated_start_date'] = $date;
+    if($date == null){
+      $options['estimated_start_date'] = StageInstance::DDTtoDTI(new DrupalDateTime());
+    }
+    $options['stage_template'] = $this->id();
+    return \Drupal::EntityTypeManager()->getStorage('stage_instance')->create($options);
+
+  }
+
+  public function createAction($target_stage_index = null, $name = "next", $triggered_events = [], $options = []){
+
+    $options["target_stage"] = $this->content_workflow->entity->stages[$target_stage_index]->target_id;
+    $options["name"] = $name;
+    $options["triggered_events"] = $triggered_events;
+    $action = \Drupal::EntityTypeManager()->getStorage("stage_action")->create($options);
+    $action->save();
+    $this->actions->appendItem($action);
+    return $action;
+  }
   /**
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = parent::baseFieldDefinitions($entity_type);
-
-    // Add the published field.
-    $fields += static::publishedBaseFieldDefinitions($entity_type);
 
     $fields['user_id'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Authored by'))
@@ -168,8 +153,9 @@ class Stage extends ContentEntityBase implements StageInterface {
         ],
       ])
       ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE);
-
+      ->setDisplayConfigurable('view', TRUE)
+      ->setCardinality(-1);
+      
     $fields['name'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Name'))
       ->setDescription(t('The name of the Stage entity.'))
@@ -191,13 +177,6 @@ class Stage extends ContentEntityBase implements StageInterface {
       ->setDisplayConfigurable('view', TRUE)
       ->setRequired(TRUE);
 
-    $fields['status']->setDescription(t('A boolean indicating whether the Stage is published.'))
-      ->setDisplayOptions('form', [
-        'type' => 'boolean_checkbox',
-        'weight' => -3,
-      ])
-      ->setDefaultValue(FALSE);
-
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))
       ->setDescription(t('The time that the entity was created.'));
@@ -206,30 +185,8 @@ class Stage extends ContentEntityBase implements StageInterface {
       ->setLabel(t('Changed'))
       ->setDescription(t('The time that the entity was last edited.'));
 
-    $fields['validated_fields'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Validated Fields'))
-      ->setDescription(t('The Validated Field Entities'))
-      ->setSetting('target_type','validated_field')
-      ->setSetting('handler','default')
-      ->setReadOnly(TRUE)
-      ->setDisplayOptions('view', [
-        'label' => 'hidden',
-        'type' => 'author',
-        'weight' => 0,
-      ])
-      ->setDisplayOptions('form', [
-        'type' => 'entity_reference_autocomplete',
-        'weight' => 5,
-        'settings' => [
-          'match_operator' => 'CONTAINS',
-          'size' => '60',
-          'autocomplete_type' => 'tags',
-          'placeholder' => '',
-        ],
-      ])
-      ->setCardinality(-1); //infinite cardinality
     $fields['content_workflow'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Content Workflow'))
+      ->setLabel(t('Workflow'))
       ->setDescription(t('The workflow this stage is a part of'))
       ->setSetting('target_type','content_workflow')
       ->setSetting('handler','default')
@@ -251,6 +208,30 @@ class Stage extends ContentEntityBase implements StageInterface {
       ])      
       ->setRequired(TRUE)
       ->setCardinality(1);
+
+    $fields['actions'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Actions'))
+      ->setDescription(t('Actions allow users to perform certain actions from there stage'))
+      ->setSetting('target_type','stage_action')
+      ->setSetting('handler','default')
+      ->setCardinality(-1);
+  
+    $fields['stage_instances'] = baseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Stage Instances'))
+      ->setSetting('target_type','stage_instance')
+      ->setSetting('handler','default')
+      ->setCardinality(-1);
+    
+    $fields['time_interval'] = baseFieldDefinition::create('interval')
+      ->setLabel(t("Default Time To Complete Stage"))
+      ->setSetting('hanndler','default')
+      ->setDefaultValue(["interval" => 2, "period" => "day"]);
+
+    $fields['auto_advance'] = baseFieldDefinition::create('boolean')
+      ->setLabel("Auto Advance")
+      ->setDescription("Decide whether to auto advance the stage once it hits its due date")
+      ->setDefaultValue(FALSE);
+
     return $fields;
   }
 

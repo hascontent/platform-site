@@ -1,0 +1,13 @@
+{
+    "name": "triggered_events",
+    "type": "drupal-module",
+    "description": "events that can be attached via a plugin system to code",
+    "keywords": [
+    ],
+    "homepage": "https://www.drupal.org/project/triggered_events",
+    "minimum-stability": "dev",
+    "support": {
+        "issues": "https://www.drupal.org/project/issues/triggered_events",
+        "source": "http://cgit.drupalcode.org/triggered_events",
+    },
+}
