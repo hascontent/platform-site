@@ -95,26 +95,26 @@ class WorkflowTemplate extends ContentEntityBase implements WorkflowTemplateInte
     // Add the published field.
     // $fields += static::publishedBaseFieldDefinitions($entity_type);
 
-    // $fields['name'] = BaseFieldDefinition::create('string')
-    //   ->setLabel(t('Name'))
-    //   ->setDescription(t('The name of the Workflow template entity.'))
-    //   ->setSettings([
-    //     'max_length' => 50,
-    //     'text_processing' => 0,
-    //   ])
-    //   ->setDefaultValue('')
-    //   ->setDisplayOptions('view', [
-    //     'label' => 'above',
-    //     'type' => 'string',
-    //     'weight' => -4,
-    //   ])
-    //   ->setDisplayOptions('form', [
-    //     'type' => 'string_textfield',
-    //     'weight' => -4,
-    //   ])
-    //   ->setDisplayConfigurable('form', TRUE)
-    //   ->setDisplayConfigurable('view', TRUE)
-    //   ->setRequired(TRUE);
+    $fields['name'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Name'))
+      ->setDescription(t('The name of the Workflow template entity.'))
+      ->setSettings([
+        'max_length' => 50,
+        'text_processing' => 0,
+      ])
+      ->setDefaultValue('')
+      ->setDisplayOptions('view', [
+        'label' => 'above',
+        'type' => 'string',
+        'weight' => -4,
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'string_textfield',
+        'weight' => -4,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE)
+      ->setRequired(TRUE);
 
     // $fields['status']->setDescription(t('A boolean indicating whether the Workflow template is published.'))
     //   ->setDisplayOptions('form', [
@@ -133,7 +133,7 @@ class WorkflowTemplate extends ContentEntityBase implements WorkflowTemplateInte
     $fields['stage_fields'] = BasefieldDefinition::create('entity_reference')
       ->setLabel(t('Validated Fields'))
       ->setDescription(t('The Validated Field Entities'))
-      ->setSetting('target_type','validated_field')
+      ->setSetting('target_type','validated_field_type')
       ->setSetting('handler','default')
       ->setReadOnly(TRUE)
       ->setDisplayConfigurable('form', TRUE)

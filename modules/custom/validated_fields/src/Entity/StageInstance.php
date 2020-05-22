@@ -181,6 +181,15 @@ class StageInstance extends ContentEntityBase implements StageInstanceInterface 
     return $arr[0] . "T" . $arr[1];
   }
 
+  public function setFields(){
+    $template_fields = $this->stage_template->entity->content_workflow->entity->workflow_template->entity->stage_fields;
+    $vf_manager = \Drupal::EntityTypeManager()->getStorage('validated_field');
+    for($i = 0; $i < $template_fields->count();$i++){
+      $field = $vf_manager->create(["field_type" => $template_fields[$i]->entity, "stage" => $this]);
+      $field->save();
+      $this->validated_fields->appendItem($field);
+    }
+  }
   public function getAdminId(){
     return $this->get('stage_template')->entity->getAdminId();
   }

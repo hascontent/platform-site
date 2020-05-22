@@ -219,6 +219,10 @@ function validated_fields_stage_instance_insert($entity){
 
 function validated_fields_stage_instance_delete($entity){
 
+  $fields = $entity->validated_fields;
+  for($i = 0; $i < $fields->count(); $i++){
+    $fields[$i]->entity->delete();
+  }
   // tie adjacent stage instances together
   $prev = $entity->prev_stage->entity;
   $next = $entity->next_stage->entity;
