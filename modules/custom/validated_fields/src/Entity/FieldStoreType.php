@@ -13,7 +13,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *   bundle_of = "field_store",
  *   entity_keys = {
  *     "id" = "id",
- *     "label" = "name",
+ *     "label" = "label",
  *     "uuid" = "uuid",
  *   },
  *   config_prefix = "field_store_type",
