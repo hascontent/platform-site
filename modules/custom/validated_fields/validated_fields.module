@@ -273,6 +273,13 @@ function validated_fields_node_preSave($entity){
     $entity->set("change_uid", \Drupal::currentUser()->id());
   }
 }
+
+function validated_fields_taxonomy_term_presave($entity){
+  if($entity->bundle() == "field_categories"){
+    $entity->set("revision_user",\Drupal::currentUser()->id());
+  }
+}
+
 function validated_fields_taxonomy_term_delete($entity){
   if($entity->bundle() == "field_categories"){
     $fields = \Drupal::EntityTypeManager()->getStorage('validated_field_type')->loadMultiple();
@@ -289,8 +296,11 @@ function validated_fields_taxonomy_term_delete($entity){
   }
 }
 
-// change modifying user to user performing modification
+// change modifying user field to current user after performing modification
 function validated_fields_validated_field_type_presave($entity){
+  $entity->set('revision_uid', \Drupal::currentUser()->id());
+}
+function validated_fields_validated_field_presave($entity){
   $entity->set('revision_uid', \Drupal::currentUser()->id());
 }
 
