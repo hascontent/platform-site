@@ -1,0 +1,12 @@
+langcode: en
+status: true
+dependencies: 
+  module:
+    - user_teams
+  enforced:
+    module:
+      - user_teams
+name: Teams
+vid: user_team
+description: 'group users into teams of content creators'
+weight: 0

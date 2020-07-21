@@ -1,0 +1,5 @@
+name: 'User Teams'
+type: module
+description: 'taxonomy grouping users into teams'
+core: 8.x
+package: 'Custom'

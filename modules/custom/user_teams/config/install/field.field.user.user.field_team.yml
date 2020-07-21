@@ -1,0 +1,33 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.user.field_team
+    - taxonomy.vocabulary.user_team
+  module:
+    - user
+    - user_teams
+enforced:
+  module:
+    - user_teams
+id: user.user.field_team
+field_name: field_team
+entity_type: user
+bundle: user
+label: team
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      user_team: user_team
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

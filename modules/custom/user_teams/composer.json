@@ -1,0 +1,13 @@
+{
+    "name": "user_teams",
+    "type": "drupal-module",
+    "description": "taxonomy grouping users into teams",
+    "keywords": [
+    ],
+    "homepage": "https://www.drupal.org/project/user_teams",
+    "minimum-stability": "dev",
+    "support": {
+        "issues": "https://www.drupal.org/project/issues/user_teams",
+        "source": "http://cgit.drupalcode.org/user_teams",
+    },
+}

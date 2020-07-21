@@ -1,0 +1,24 @@
+uuid: 78e5dd9d-678a-4661-a83c-196755a9268d
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.user.field_internal
+  module:
+    - user
+id: user.user.field_internal
+field_name: field_internal
+entity_type: user
+bundle: user
+label: internal
+description: 'Is this an internal member of the team'
+required: false
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: Internal
+  off_label: External
+field_type: boolean

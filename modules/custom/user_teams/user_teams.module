@@ -1,0 +1,46 @@
+<?php
+
+/**
+ * @file
+ * Contains user_teams.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function user_teams_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the user_teams module.
+    case 'help.page.user_teams':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('taxonomy grouping users into teams') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+function user_teams_taxonomy_term_presave($entity){
+  if($entity->bundle() == "field_team"){
+    $entity->set("revision_user",\Drupal::currentUser()->id());
+  }
+}
+
+// function user_teams_taxonomy_term_delete($entity){
+//   if($entity->bundle() == "field_team"){
+//     $users = \Drupal::EntityTypeManager()->getStorage('user')->loadMultiple();
+//     foreach($users as $user){
+//       $team = $user->field_team;
+//       for($i = 0; $i < $team->count(); $i++){
+//         if($team[$i]->target_id == $entity->id()){
+//           $team->removeItem($i);
+//           $i--;
+//           $user->save();
+//         }
+//       }
+//     }
+//   }
+// }
