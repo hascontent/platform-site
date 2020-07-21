@@ -26,6 +26,10 @@
         "drupal/core-recommended": "^8.8",
         "drupal/core-vendor-hardening": "^8.8",
         "drupal/interval": "^1.5",
+        "drupal/jsonapi_extras": "^3.15",
+        "drupal/openapi": "^2.0",
+        "drupal/openapi_rest": "^2.0",
+        "drupal/sendgrid_integration": "^1.4",
         "drupal/simple_oauth": "^4"
     },
     "require-dev": {},
