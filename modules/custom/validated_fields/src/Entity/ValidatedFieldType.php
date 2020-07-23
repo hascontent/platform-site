@@ -301,6 +301,28 @@ class ValidatedFieldType extends ContentEntityBase implements ValidatedFieldType
       ->setDisplayConfigurable('form', TRUE)
       ->setCardinality(-1);
     
+    $fields['is_template'] = BaseFieldDefinition::create("boolean")
+      ->setLabel('Template Field')
+      ->setDisplayOptions('form', [
+        'type' => 'boolean_checkbox',
+        'weight' => -3,
+      ])
+      ->setDefaultValue(FALSE);
+    
+    $fields['permission_level'] = BaseFieldDefinition::create('integer')
+      ->setLabel(t("Permission Level"))
+      ->setDescription(t("Sets amount of permissions owner has"))
+      ->addPropertyConstraints('value',['Range'=> ['min' => 0, 'max' => 3]])
+      ->setDefaultValue(0)
+      ->setDisplayOptions('form', [
+        'type' => 'number'
+      ]);
+    
+    $fields['parent_template'] = baseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Field Template'))
+      ->setSetting('target_type','validated_field')
+      ->setSetting('handler','default')
+      ->setCardinality(1);
     return $fields;
   }
 

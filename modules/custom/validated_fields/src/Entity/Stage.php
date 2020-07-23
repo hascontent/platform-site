@@ -232,6 +232,11 @@ class Stage extends ContentEntityBase implements StageInterface {
       ->setDescription("Decide whether to auto advance the stage once it hits its due date")
       ->setDefaultValue(FALSE);
 
+    $fields['field_templates'] = baseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Field Template'))
+      ->setSetting('target_type','validated_field')
+      ->setSetting('handler','default')
+      ->setCardinality(-1);
     return $fields;
   }
 
