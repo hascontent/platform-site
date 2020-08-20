@@ -50,9 +50,9 @@ function validated_fields_install(){
     ));
     $field_config->save();
   }
-    $category = \Drupal::EntityTypeManager()->getStorage('taxonomy_term')->create(["vid" => "field_categories", "name" => "default"]);
+    $category = \Drupal::EntityTypeManager()->getStorage('taxonomy_term')->create(["vid" => "field_categories", "name" => "default", "is_template" => true]);
     $category->save();
-    $vft = \Drupal::EntityTypeManager()->getStorage("validated_field_type")->create(["field_type" => "text", "category" => "default", "name" => "default text"]);
+    $vft = \Drupal::EntityTypeManager()->getStorage("validated_field_type")->create(["field_type" => "text", "category" => "default", "name" => "default text", "is_template" => true]);
     $vft->save();
 
     $cw = \Drupal::EntityTypeManager()->getStorage('content_workflow')->create(['name' => 'test_wf', 'user_id' => 1]);
@@ -115,8 +115,9 @@ function validated_fields_stage_presave($entity){
     }
   }
 }
-// when stage is posted, adds it to list of content_workflow stages in corresponding content_workflow entity
 function validated_fields_stage_insert($entity){
+
+  // when stage is posted, adds it to list of content_workflow stages in corresponding content_workflow entity
   $workflow = $entity->get("content_workflow")->entity;
   $workflow_stages = $workflow->stages;
   for($i = 0; $i<$workflow_stages->count(); $i++){
@@ -127,6 +128,19 @@ function validated_fields_stage_insert($entity){
   $workflow_stages->appendItem($entity);
   $workflow->save();
   
+  // create permission entities referencing stage
+  $stage_id = $entity->id();
+  $itr = $workflow->stage_fields->getIterator();
+  while($itr->valid()){
+    $field_id = $itr->current()->target_id;
+    $stage_field_permission = \Drupal::EntityTypeManager()->getStorage("stage_field_permission")->create([
+      "permission_level" => 0,
+      "workflow_field" => $field_id,
+      "stage" => $stage_id
+    ]);
+    $stage_field_permission->save();
+    $itr->next();
+  }
 }
 
 //when stage is deleted, move subsequent stages left by 1 in content_workflow stages array
@@ -134,7 +148,7 @@ function validated_fields_stage_delete($entity){
   $stage_id = $entity->id();
   $content_workflow = $entity->content_workflow->entity;
 
-  if($stage->name->value == Entity\Stage::__COMPLETE__){
+  if($entity->name->value == Entity\Stage::__COMPLETE__){
     
   }
   $stage_list = $content_workflow->stages;
@@ -146,9 +160,18 @@ function validated_fields_stage_delete($entity){
       break;
     }
   }
+
+  //delete stage permissions
+  $itr = $entity->permission_levels->getIterator();
+  while($itr->valid()){
+    if($itr->current()->entity){
+      $itr->current()->entity->delete();
+    }
+    $itr->next();
+  }
 }
-//delete stage instances when stage is deleted
 function validated_fields_stage_predelete($entity){
+  //delete stage instances when stage is deleted
   $itr = $entity->stage_instances->getIterator();
   while($itr->valid()){
     $itr->current()->entity->delete();
@@ -161,6 +184,7 @@ function validated_fields_stage_predelete($entity){
     $itr->current()->entity->delete();
     $itr->next();
   }
+
 }
 
 function validated_fields_stage_instance_presave($entity){
@@ -265,6 +289,11 @@ function validated_fields_content_workflow_predelete($entity){
   if($entity->final_stage->entity !== null){
     $entity->final_stage->entity->delete();
   }
+  $itr = $entity->stage_fields->getIterator();
+  while($itr->valid()){
+    $itr->current()->entity->delete();
+    $itr->next();
+  }
 }
 
 // hook to change change user
@@ -296,6 +325,54 @@ function validated_fields_taxonomy_term_delete($entity){
   }
 }
 
+// vft hooks for adding or removing itself from content workflow
+function validated_fields_validated_field_type_delete($entity){
+  if((!$entity->is_template->value) && $entity->content_workflow->target_id != null){
+    $cw = $entity->content_workflow->entity;
+    $field_id = $entity->id();
+    for($i = 0; $i < $cw->stage_fields->count(); $i++){
+      if($cw->stage_fields[$i]->target_id == $field_id){
+        $cw->stage_fields->removeItem($i);
+        $cw->save();
+      }
+    }
+
+    
+  }
+
+  //delete stage permissions
+  $itr = $entity->permission_levels->getIterator();
+  while($itr->valid()){
+    if($itr->current()->entity){
+      $itr->current()->entity->delete();
+    }
+    $itr->next();
+  }
+}
+
+function validated_fields_validated_field_type_insert($entity){
+  //attach field to workflow if it is not a template
+  if(!$entity->is_template->value){
+    $cw = $entity->content_workflow->entity;
+    $cw->stage_fields->appendItem($entity);
+    $cw->save();
+
+    // create permission entities referencing field
+    $field_id = $entity->id();
+    $itr = $cw->stages->getIterator();
+    while($itr->valid()){
+      $stage_id = $itr->current()->target_id;
+      $stage_field_permission = \Drupal::EntityTypeManager()->getStorage("stage_field_permission")->create([
+        "permission_level" => 0,
+        "workflow_field" => $field_id,
+        "stage" => $stage_id
+      ]);
+      $stage_field_permission->save();
+      $itr->next();
+  }
+  }
+
+}
 // change modifying user field to current user after performing modification
 function validated_fields_validated_field_type_presave($entity){
   $entity->set('revision_uid', \Drupal::currentUser()->id());
@@ -315,6 +392,44 @@ function validated_fields_cron(){
       // update the status and completion date of the current and next stage
       $content_workflow = $stage->stage_template->entity->content_workflow->entity;
       $content_workflow->transitionStage(0);
+    }
+  }
+}
+
+//stage field permissions
+
+//add permission to field and stage
+function validated_fields_stage_field_permission_insert($entity){
+  $field = $entity->workflow_field->entity;
+  $stage = $entity->stage->entity;
+  $field->permission_levels->appendItem($entity);
+  $field->save();
+  $stage->permission_levels->appendItem($entity);
+  $stage->save();
+}
+
+//remove permission from field and stage
+function validated_fields_stage_field_permission_delete($entity){
+  $field = $entity->workflow_field->entity;
+  $stage = $entity->stage->entity;
+  if($field){
+    $perm_lvls = $field->permission_levels;
+    for($i = 0; $i < $perm_lvls->count(); $i++){
+      if($perm_lvls[$i]->target_id == $entity->id()){
+        $field->permission_levels->removeItem($i);
+        $field->save();
+        break;
+      }
+    }
+  }
+  if($stage){
+    $perm_lvls = $stage->permission_levels;
+    for($i = 0; $i < $perm_lvls->count(); $i++){
+      if($perm_lvls[$i]->target_id == $entity->id()){
+        $stage->permission_levels->removeItem($i);
+        $stage->save();
+        break;
+      }
     }
   }
 }

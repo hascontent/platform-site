@@ -125,3 +125,10 @@ view published action record entities:
 view unpublished action record entities:
   title: 'View unpublished Action Record entities'
 
+add stage field permission entities:
+  title: 'Create new Stage field permission entities'
+
+administer stage field permission entities:
+  title: 'Administer Stage field permission entities'
+  description: 'Allow to access the administration form to configure Stage field permission entities.'
+  restrict access: true

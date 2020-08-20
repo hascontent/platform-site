@@ -453,12 +453,23 @@ class ContentWorkflow extends ContentEntityBase implements ContentWorkflowInterf
       ->setCardinality(1)
       ->setDefaultValue(-1);
 
-    $fields['workflow_template'] = BaseFieldDefinition::create('entity_reference')
-      ->setSetting('target_type','workflow_template')
+    $fields['is_template'] = BaseFieldDefinition::create("boolean")
+      ->setLabel('Template Field')
+      ->setDisplayOptions('form', [
+        'type' => 'boolean_checkbox',
+        'weight' => -3,
+      ])
+      ->setDefaultValue(FALSE);
+
+    $fields['stage_fields'] = BasefieldDefinition::create('entity_reference')
+      ->setLabel(t('Validated Fields'))
+      ->setDescription(t('The Validated Field Entities'))
+      ->setSetting('target_type','validated_field_type')
       ->setSetting('handler','default')
-      ->setCardinality(1)
-      // ->setRequired(TRUE)
-      ;
+      ->setReadOnly(TRUE)
+      ->setDisplayConfigurable('form', TRUE)
+      ->setCardinality(-1);
+
     $fields["final_stage"] = BaseFieldDefinition::create('entity_reference')
         ->setSetting('target_type', 'stage')
         ->setSetting('handler','default')

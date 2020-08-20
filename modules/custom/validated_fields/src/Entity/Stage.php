@@ -232,11 +232,17 @@ class Stage extends ContentEntityBase implements StageInterface {
       ->setDescription("Decide whether to auto advance the stage once it hits its due date")
       ->setDefaultValue(FALSE);
 
-    $fields['field_templates'] = baseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Field Template'))
-      ->setSetting('target_type','validated_field')
+    $fields['permission_levels'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Permission Levels'))
+      ->setDescription(t('Permission Levels for each field stored in a referenced entity'))
+      ->setSetting('target_type','stage_field_permission')
       ->setSetting('handler','default')
       ->setCardinality(-1);
+    // $fields['field_templates'] = baseFieldDefinition::create('entity_reference')
+    //   ->setLabel(t('Field Template'))
+    //   ->setSetting('target_type','validated_field')
+    //   ->setSetting('handler','default')
+    //   ->setCardinality(-1);
     return $fields;
   }
 

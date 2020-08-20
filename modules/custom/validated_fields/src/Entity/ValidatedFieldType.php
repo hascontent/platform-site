@@ -308,19 +308,25 @@ class ValidatedFieldType extends ContentEntityBase implements ValidatedFieldType
         'weight' => -3,
       ])
       ->setDefaultValue(FALSE);
-    
-    $fields['permission_level'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t("Permission Level"))
-      ->setDescription(t("Sets amount of permissions owner has"))
-      ->addPropertyConstraints('value',['Range'=> ['min' => 0, 'max' => 3]])
-      ->setDefaultValue(0)
-      ->setDisplayOptions('form', [
-        'type' => 'number'
-      ]);
+// Non-Template Fields
+    // permission levels
+    $fields['permission_levels'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Permission Levels'))
+      ->setDescription(t('Permission Levels for each stage stored in a referenced entity'))
+      ->setSetting('target_type','stage_field_permission')
+      ->setSetting('handler','default')
+      ->setCardinality(-1);
     
     $fields['parent_template'] = baseFieldDefinition::create('entity_reference')
       ->setLabel(t('Field Template'))
-      ->setSetting('target_type','validated_field')
+      ->setSetting('target_type','validated_field_type')
+      ->setSetting('handler','default')
+      ->setCardinality(1);
+
+    $fields['content_workflow'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Workflow'))
+      ->setDescription(t('The workflow this stage is a part of'))
+      ->setSetting('target_type','content_workflow')
       ->setSetting('handler','default')
       ->setCardinality(1);
     return $fields;
