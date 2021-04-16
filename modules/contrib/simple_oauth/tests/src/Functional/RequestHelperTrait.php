@@ -3,7 +3,6 @@
 namespace Drupal\Tests\simple_oauth\Functional;
 
 use Drupal\Core\Url;
-use GuzzleHttp\RequestOptions;
 
 /**
  *
@@ -46,9 +45,6 @@ trait RequestHelperTrait {
    * @return mixed
    */
   protected function get(Url $url, $options = []) {
-    $options += [
-      RequestOptions::HTTP_ERRORS => FALSE,
-    ];
     $session = $this->getSession();
     $get_url = $this->getAbsoluteUrl($url->toString());
     $session->setCookie('SIMPLETEST_USER_AGENT', drupal_generate_test_ua($this->databasePrefix));

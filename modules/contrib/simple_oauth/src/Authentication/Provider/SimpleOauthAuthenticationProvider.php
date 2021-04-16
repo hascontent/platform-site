@@ -9,7 +9,6 @@ use Drupal\simple_oauth\PageCache\SimpleOauthRequestPolicyInterface;
 use Drupal\simple_oauth\Server\ResourceServerInterface;
 use League\OAuth2\Server\Exception\OAuthServerException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * @internal
@@ -78,11 +77,7 @@ class SimpleOauthAuthenticationProvider implements AuthenticationProviderInterfa
       // Procedural code here is hard to avoid.
       watchdog_exception('simple_oauth', $exception);
 
-      throw new HttpException(
-        $exception->getHttpStatusCode(),
-        $exception->getHint(),
-        $exception
-      );
+      return NULL;
     }
 
     $tokens = $this->entityTypeManager->getStorage('oauth2_token')->loadByProperties([
@@ -96,17 +91,11 @@ class SimpleOauthAuthenticationProvider implements AuthenticationProviderInterfa
     if ($account->isBlocked() && $account->isAuthenticated()) {
       $token->revoke();
       $token->save();
-      $exception = OAuthServerException::accessDenied(
+      throw OAuthServerException::accessDenied(
         t(
           '%name is blocked or has not been activated yet.',
           ['%name' => $account->getAccountName()]
         )
-      );
-      watchdog_exception('simple_oauth', $exception);
-      throw new HttpException(
-        $exception->getHttpStatusCode(),
-        $exception->getHint(),
-        $exception
       );
     }
 

@@ -30,9 +30,8 @@
         "drupal/openapi": "^2.0",
         "drupal/openapi_rest": "^2.0",
         "drupal/sendgrid_integration": "^1.4",
-        "drupal/simple_oauth": "^4"
+        "drupal/simple_oauth": "^3"
     },
-    "require-dev": {},
     "conflict": {
         "drupal/drupal": "*"
     },

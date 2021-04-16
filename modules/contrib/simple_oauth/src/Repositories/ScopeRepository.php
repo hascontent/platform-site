@@ -9,14 +9,9 @@ use League\OAuth2\Server\Entities\ScopeEntityInterface;
 use League\OAuth2\Server\Repositories\ScopeRepositoryInterface;
 use Drupal\simple_oauth\Entities\ScopeEntity;
 
-/**
- * The repository for scopes.
- */
 class ScopeRepository implements ScopeRepositoryInterface {
 
   /**
-   * The entity type manager.
-   *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
   protected $entityTypeManager;
@@ -57,7 +52,7 @@ class ScopeRepository implements ScopeRepositoryInterface {
       $default_user = $client_entity->getDrupalEntity()->get('user_id')->entity;
     }
     catch (\InvalidArgumentException $e) {
-      // Do nothing.
+      // Do nothing. This means that simple_oauth_extras is not enabled.
     }
     /** @var \Drupal\user\UserInterface $user */
     $user = $user_identifier

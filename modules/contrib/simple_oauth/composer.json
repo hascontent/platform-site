@@ -4,8 +4,7 @@
     "type": "drupal-module",
     "require": {
         "league/oauth2-server": "^7.1",
-        "drupal/consumers": "^1.2",
-        "php": ">=7.0"
+        "drupal/consumers": "^1.2"
     },
     "license": "GPL-2.0+",
     "authors": [
